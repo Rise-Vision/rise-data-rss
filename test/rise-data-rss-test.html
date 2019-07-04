@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>rise-data-rss test</title>
+
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+
+    <script type="text/javascript">
+      RisePlayerConfiguration = {
+        isConfigured: () => true
+      };
+    </script>
+
+    <script type="module" src="../src/rise-data-rss.js"></script>
+  </head>
+  <body>
+
+    <test-fixture id="StaticIdTestFixture">
+      <template>
+        <rise-data-rss id="rise-data-rss-id" value="rise-data-rss-value"></rise-data-rss>
+      </template>
+    </test-fixture>
+
+    <script type="module">
+      suite('rise-data-rss', () => {
+
+        test('setting "id" attribute on the element works', () => {
+          // Get instance of element from test fixture
+          const element = fixture('StaticIdTestFixture');
+          assert.equal(element.id, 'rise-data-rss-id');
+        });
+
+        test('"configured" event should be sent when "ready" is called', (done) => {
+          const element = fixture('StaticIdTestFixture');
+          element.addEventListener('configured', function (event) {
+            assert.equal(event.type, 'configured');
+            done();
+          });
+
+          //calling "ready" should trigger event
+          element.ready();
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
