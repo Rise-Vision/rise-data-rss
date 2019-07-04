@@ -4,7 +4,7 @@
   "description": "Rise Data Rss",
   "scripts": {
     "prebuild": "eslint .",
-    "build": "polymer build && ./node_modules/common-component/extract-source.sh rise-data-rss",
+    "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-data-rss",
     "test": "eslint . && polymer test"
   },
   "repository": {
