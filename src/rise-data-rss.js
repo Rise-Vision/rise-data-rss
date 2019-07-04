@@ -5,7 +5,7 @@ import { version } from "./rise-data-rss-version.js";
 export default class RiseDataRss extends RiseElement {
 
   static get template() {
-    return html`[[value]]`;
+    return html`[[maxItems]]`;
   }
 
   static get properties() {
