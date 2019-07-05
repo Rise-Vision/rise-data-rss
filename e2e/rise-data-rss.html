@@ -42,9 +42,6 @@
         }
       }
     </script>
-    <style>
-       h1 { font-size: 72px; }
-    </style>
   </head>
   <body>
     <rise-data-rss
@@ -58,15 +55,7 @@
         console.log('Rise components ready');
       }
 
-      window.addEventListener( "rise-components-ready", configureComponents );
-
-      // Demonstrating how to handle no connection to local messaging via listening for event
-      // Note: the connection can also be checked via RisePlayerConfiguration.LocalMessaging.isConnected()
-      window.addEventListener( "rise-local-messaging-connection", event => {
-        if ( !event.detail.isConnected ) {
-          console.log( "no connection to local messaging");
-        }
-      } );
+      window.addEventListener("rise-components-ready", configureComponents);
     </script>
     <script>
       RisePlayerConfiguration.configure();

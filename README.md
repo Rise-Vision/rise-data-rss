@@ -30,6 +30,8 @@ This component receives the following list of attributes:
 - **max-items**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements, up to the maximum, are retrieved. Defaults to 25, which is also the maximum.
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the Template Editor.
 
+This component does not support PUD; it will need to be handled by Designers on a per Template basis.
+
 ### Events
 
 The component sends the following events:

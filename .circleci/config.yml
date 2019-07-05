@@ -54,6 +54,7 @@ jobs:
     docker: &GCSIMAGE
       - image: jenkinsrise/cci-v2-launcher-electron:0.0.6
         environment:
+          COMPONENT_NAME: rise-data-rss
           WIDGETS_BASE: gs://widgets.risevision.com
     steps:
       - run: mkdir -p ~/.ssh
@@ -113,9 +114,9 @@ jobs:
       - run: cp -r gcloud ~/.config
       - run: |
           VERSION=$(cat version-string/version)
-          TARGET=$WIDGETS_BASE/staging/components/rise-data-rss/$VERSION/
-          echo Deploying version $VERSION to rise-data-rss
-          node_modules/rise-common-component/scripts/deploy-gcs.sh rise-data-rss $TARGET
+          TARGET=$WIDGETS_BASE/staging/components/$COMPONENT_NAME/$VERSION/
+          echo Deploying version $VERSION to $COMPONENT_NAME
+          node_modules/rise-common-component/scripts/deploy-gcs.sh $COMPONENT_NAME $TARGET
 
   deploy-e2e-page:
     parameters:
@@ -131,11 +132,11 @@ jobs:
       - run: mkdir -p ~/.config
       - run: cp -r gcloud ~/.config
       - run: |
-          TARGET=$WIDGETS_BASE/<< parameters.stage >>/e2e/rise-data-rss/electron
-          echo Deploying << parameters.stage >> electron e2e page for rise-data-rss
-          gsutil rsync -d -r base $TARGET
+          TARGET=$WIDGETS_BASE/<< parameters.stage >>/e2e/$COMPONENT_NAME/electron
+          echo Deploying << parameters.stage >> electron e2e page for $COMPONENT_NAME
+          gsutil -m rsync -d -r base $TARGET
           gsutil -m setmeta -r -h "Cache-Control:private, max-age=0" $TARGET
-          gsutil acl -r ch -u AllUsers:R $TARGET
+          gsutil -m acl -r ch -u AllUsers:R $TARGET
 
   test-e2e-electron:
     parameters:
@@ -199,9 +200,9 @@ jobs:
       - run: cp -r gcloud ~/.config
       - run: |
           MAJOR=$(grep version package.json | grep -Po '[0-9]+' | head -1)
-          TARGET=$WIDGETS_BASE/<< parameters.stage >>/components/rise-data-rss/$MAJOR/
-          echo Deploying << parameters.stage >> version of rise-data-rss/$MAJOR
-          node_modules/rise-common-component/scripts/deploy-gcs.sh rise-data-rss $TARGET
+          TARGET=$WIDGETS_BASE/<< parameters.stage >>/components/$COMPONENT_NAME/$MAJOR/
+          echo Deploying << parameters.stage >> version of $COMPONENT_NAME/$MAJOR
+          node_modules/rise-common-component/scripts/deploy-gcs.sh $COMPONENT_NAME $TARGET
 
 workflows:
   workflow1:
