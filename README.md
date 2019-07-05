@@ -27,7 +27,7 @@ This component receives the following list of attributes:
 - **id**: ( string ): Unique HTMLElement id.
 - **label**: (string): Assigns the label to use for the instance of the component in Template Editor.
 - **feed-url**: (string / required): The url to the RSS feed to be used for this instance.
-- **max-items**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements are retrieved. Defaults to 25.
+- **max-items**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements, up to the maximum, are retrieved. Defaults to 25, which is also the maximum.
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the Template Editor.
 
 ### Events
@@ -35,12 +35,12 @@ This component receives the following list of attributes:
 The component sends the following events:
 
 - **configured**: The component has initialized what it requires to and is ready to handle a _start_ event.
-- **rss-data-update**: An event proving a maximum of max-items elements from the provided feed-url. The provided format can be checked here: https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser.
-- **rss-error**: An event indicating an error occurred (i.e. feed retrieval, feed format, etc) and provides an object in event.detail that contains the error message and error detail
+- **rss-data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. The provided format can be checked [here] (https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
+- **rss-error**: An event indicating an error occurred (i.e. feed retrieval, feed format, etc). It provides errorMessage and errorDetail as in other components.
 
 The component listens for the following events:
 
-- **start**: This event will make an initial fetch for the RSS feed and then periodically fetch the RSS feed. It can be dispatched to the component when _configured_ event has been fired.
+- **start**: This event will make an initial fetch for the RSS feed and then periodically fetch the RSS feed (refresh will be disabled in Preview). It can be dispatched to the component when the _configured_ event has been fired.
 
 ### Logging
 
