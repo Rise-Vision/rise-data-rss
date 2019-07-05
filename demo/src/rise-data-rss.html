@@ -38,7 +38,11 @@
 
   <script>
     function configureComponents() {
+      const riseDataRSS01 = document.querySelector('#rise-data-rss-01');
       console.log('Rise components ready');
+
+      // Uncomment if testing directly in browser
+      // [ riseDataRSS01 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
     }
 
     window.addEventListener( "rise-components-ready", configureComponents );

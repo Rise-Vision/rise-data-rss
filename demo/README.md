@@ -34,7 +34,7 @@ The output is created into the build/prod directory.
 
 To do this, first uncomment this line in src/rise-data-rss.html
 
-`// [ video01 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );`
+`// [ riseDataRSS01 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );`
 
 and run:
 

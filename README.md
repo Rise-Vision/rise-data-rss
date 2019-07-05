@@ -37,8 +37,9 @@ This component does not support PUD; it will need to be handled by Designers on 
 The component sends the following events:
 
 - **configured**: The component has initialized what it requires to and is ready to handle a _start_ event.
-- **rss-data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. This event will be generated on startup and whenever data on the feed has changed; if the feed has not changed since the last refresh, an event will not be generated. The provided format can be checked [here](https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
-- **rss-error**: An event indicating an error occurred (i.e. feed retrieval, feed format, etc). It provides errorMessage and errorDetail as in other components.
+- **data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. This event will be generated on startup and whenever data on the feed has changed; if the feed has not changed since the last refresh, an event will not be generated. The data object is provided in `event.details`. The response format can be checked [here](https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
+- **data-error**: An event indicating the feed responded with an error (i.e. feed format, etc). An error object is provided in `event.details`.
+- **request-error**: An event indicating there were problems requesting the feed. An error object is provided in `event.details`.
 
 The component listens for the following events:
 
