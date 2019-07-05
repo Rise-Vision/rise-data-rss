@@ -11,6 +11,7 @@
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../node_modules/chai/chai.js"></script>
     <script src="../node_modules/wct-mocha/wct-mocha.js"></script>
+    <script src="../node_modules/sinon/pkg/sinon.js"></script>
 
     <script type="text/javascript">
       RisePlayerConfiguration = {
@@ -18,36 +19,71 @@
       };
     </script>
 
+    <script type="module" src="../src/rise-data-rss-config.js"></script>
     <script type="module" src="../src/rise-data-rss.js"></script>
   </head>
   <body>
-
-    <test-fixture id="StaticIdTestFixture">
+    <test-fixture id="test-block">
       <template>
-        <rise-data-rss id="rise-data-rss-id" value="rise-data-rss-value"></rise-data-rss>
+        <rise-data-rss></rise-data-rss>
       </template>
     </test-fixture>
 
     <script type="module">
       suite('rise-data-rss', () => {
+        let sandbox = sinon.createSandbox();
+        let element;
+        let logger;
 
-        test('setting "id" attribute on the element works', () => {
-          // Get instance of element from test fixture
-          const element = fixture('StaticIdTestFixture');
-          assert.equal(element.id, 'rise-data-rss-id');
+        setup(() => {
+          element = fixture("test-block");
+
+          // RiseDataRss => RiseElement => LoggerMixin
+          logger = element.__proto__.__proto__.__proto__;
+
+          sandbox.stub(logger, "initLogger");
+          sandbox.stub(logger, "log");
+          sandbox.stub(window, "fetch");
         });
 
-        test('"configured" event should be sent when "ready" is called', (done) => {
-          const element = fixture('StaticIdTestFixture');
-          element.addEventListener('configured', function (event) {
-            assert.equal(event.type, 'configured');
-            done();
+        teardown(()=>{
+          sandbox.restore();
+        });
+
+        suite( "Properties", () => {
+          test("should not set feedUrl", () => {
+            assert.notOk(element.feedUrl);
           });
 
-          //calling "ready" should trigger event
-          element.ready();
+          test("should set maxItems", () => {
+            assert.equal(element.maxItems, 25);
+          });
         });
 
+        suite("ready", () => {
+          let stub;
+
+          setup(() => {
+            stub = sandbox.stub(window, "addEventListener");
+          });
+
+          test("should listen for rise-components-ready and call init", () => {
+            RisePlayerConfiguration.isConfigured = () => false;
+            element.ready();
+
+            assert.isTrue(stub.calledWith('rise-components-ready'));
+          });
+
+          test("should call _init() if  RisePlayerConfiguration is configured", () => {
+            RisePlayerConfiguration.isConfigured = () => true;
+            sandbox.stub(element, '_init');
+
+            element.ready();
+
+            assert.isTrue(element._init.calledOnce);
+            assert.isFalse(stub.calledOnce);
+          });
+        });
       });
     </script>
 

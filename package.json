@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Rise Data Rss",
   "scripts": {
-    "prebuild": "eslint .",
+    "prebuild": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh prod rise-data-rss",
     "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-data-rss",
     "test": "eslint . && polymer test"
   },

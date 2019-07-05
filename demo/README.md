@@ -30,7 +30,9 @@ The output is created into the build/prod directory.
 
 ## Run instructions
 
-### Option a) Use local web server and run directly in Chrome browser
+### Option A
+
+#### Use local web server and run directly in Chrome browser
 
 To do this, first uncomment this line in src/rise-data-rss.html
 
@@ -50,7 +52,9 @@ python -m SimpleHTTPServer 8999
 Then go to http://localhost:8999/src/rise-data-rss.html in Chrome browser.
 
 
-### Option b) Running the ChromeOS app in Chrome browser
+### Option B
+
+#### Running the ChromeOS app in Chrome browser
 
 To do this all the contents of build/prod may be uploaded to GCS,
 with public permissions and no caching. To avoid CORS issues, the server
