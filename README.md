@@ -35,7 +35,7 @@ This component receives the following list of attributes:
 The component sends the following events:
 
 - **configured**: The component has initialized what it requires to and is ready to handle a _start_ event.
-- **rss-data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. The provided format can be checked [here] (https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
+- **rss-data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. This event will be generated on startup and whenever data on the feed has changed; if the feed has not changed since the last refresh, an event will not be generated. The provided format can be checked [here](https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
 - **rss-error**: An event indicating an error occurred (i.e. feed retrieval, feed format, etc). It provides errorMessage and errorDetail as in other components.
 
 The component listens for the following events:
@@ -47,7 +47,7 @@ The component listens for the following events:
 The component logs the following events to BQ:
 
 - **rss-start**: The component receives the start event and commences execution.
-- **rss-update**: The component detected new data in the feed and reported to the consumer.
+- **rss-data-update**: The component detected new data in the feed and reported it to the consumer.
 - **rss-feed-parser-error**: The component was not able to connect to feed-parser.
 - **rss-data-error**: The component received an error from feed-parser. The details of the error will be provided as part of the log.
 
