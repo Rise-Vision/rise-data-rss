@@ -56,7 +56,6 @@
           // RiseDataRss => RiseElement => LoggerMixin
           logger = element.__proto__.__proto__.__proto__;
 
-          sandbox.stub(logger, "initLogger");
           sandbox.stub(logger, "log");
           sandbox.stub(window, "fetch");
         });
