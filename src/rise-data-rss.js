@@ -90,11 +90,10 @@ export default class RiseDataRss extends RiseElement {
   }
 
   _handleResponse(data) {
-    console.log('_handleResponse', data);
     if (!data.Error) {
-      // Temporary solution; this should use a more robust comparison method
+      // Temporary solution; this should use a more robust comparison method such as deep-equal
       if (JSON.stringify(this.feedData) !== JSON.stringify(data)) {
-        this._setFeedData(data);
+        this._setFeedData(data.slice(0, this.maxItems));
 
         super.log("info", "rss-data-update", this.feedData);
         this._sendEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
