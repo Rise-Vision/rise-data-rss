@@ -33,27 +33,43 @@
 
 <body>
 
-  <rise-data-rss id="rise-data-rss-id" value="rise-data-rss-value">
+  <rise-data-rss
+      id="rise-data-rss-01" label="Test Feed"
+      feed-url="https://www.feedforall.com/sample.xml"
+      max-items="15">
   </rise-data-rss>
 
   <script>
     function configureComponents() {
       const riseDataRSS01 = document.querySelector('#rise-data-rss-01');
+
+      riseDataRSS01.addEventListener("data-update", data => {
+        console.log("Received feed-parser data", data);
+      });
+
+      riseDataRSS01.addEventListener("data-error", error => {
+        console.log("Received invalid feed-parser data", error);
+      });
+
+      riseDataRSS01.addEventListener("request-error", error => {
+        console.log("Failed to connect to feed-parser", error);
+      });
+
       console.log('Rise components ready');
 
       // Uncomment if testing directly in browser
-      // [ riseDataRSS01 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
+      [ riseDataRSS01 ].forEach( el => RisePlayerConfiguration.Helpers.sendStartEvent( el ) );
     }
 
-    window.addEventListener( "rise-components-ready", configureComponents );
+    window.addEventListener("rise-components-ready", configureComponents);
 
     // Demonstrating how to handle no connection to local messaging via listening for event
     // Note: the connection can also be checked via RisePlayerConfiguration.LocalMessaging.isConnected()
-    window.addEventListener( "rise-local-messaging-connection", event => {
+    window.addEventListener("rise-local-messaging-connection", event => {
       if ( !event.detail.isConnected ) {
         console.log( "no connection to local messaging");
       }
-    } );
+    });
   </script>
   <script>
     RisePlayerConfiguration.configure();
