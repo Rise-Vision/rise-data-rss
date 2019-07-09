@@ -31,6 +31,21 @@
 
     <script type="module">
       suite('rise-data-rss', () => {
+        const sampleServerUrl = "https://feed-parser.risevision.com/";
+        const sampleFeedUrl = "https://www.feedforall.com/sample.xml";
+        const validRssJson = JSON.stringify([
+          {
+            title: "Title 1",
+            description: "Description 1",
+            image: {
+              url: "http://www.feedforall.com/ffalogo48x48.gif",
+              title: "FeedForAll Sample Feed"
+            }
+          }
+        ]);
+        const invalidRssJson = JSON.stringify({
+          Error: "An error has occurred"
+        });
         let sandbox = sinon.createSandbox();
         let element;
         let logger;
@@ -74,7 +89,7 @@
             assert.isTrue(stub.calledWith('rise-components-ready'));
           });
 
-          test("should call _init() if  RisePlayerConfiguration is configured", () => {
+          test("should call _init() if RisePlayerConfiguration is configured", () => {
             RisePlayerConfiguration.isConfigured = () => true;
             sandbox.stub(element, '_init');
 
@@ -84,8 +99,111 @@
             assert.isFalse(stub.calledOnce);
           });
         });
+
+        suite("init", () => {
+          test("should listen for 'start' event", () => {
+            sandbox.stub(element, "addEventListener");
+            element._init();
+            assert.isTrue(element.addEventListener.calledWith("start"));
+          });
+
+          test("should raise 'configured' event", () => {
+            sandbox.stub(element, "dispatchEvent");
+            element._init();
+            assert.equal(element.dispatchEvent.getCall(0).args[0].type, "configured");
+          });
+        });
+
+        suite("'start' event", () => {
+          test("should request data only after start has been called", done => {
+            sandbox.stub(element, "_requestData");
+
+            element.feedUrl = "sampleFeedUrl";
+
+            setTimeout(() => {
+              assert.isFalse(element._requestData.called);
+
+              element.dispatchEvent(new CustomEvent("start"));
+
+              setTimeout(() => {
+                assert.isTrue(element._requestData.called);
+                done();
+              });
+            });
+          });
+        });
+
+        suite("_requestData", () => {
+          let response;
+
+          setup(() => {
+            sandbox.stub(element, "_sendEvent");
+
+            element.dispatchEvent(new CustomEvent("start"));
+          });
+
+          test("should handle a valid response from feed-parser", done => {
+            window.fetch.resolves(new Response(validRssJson));
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+
+              // Should log the received data
+              assert.equal(element.log.getCall(2).args[1], "rss-data-update");
+              assert.equal(JSON.stringify(element.log.getCall(2).args[2]), validRssJson);
+              // Should send a data-update event
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+              assert.equal(JSON.stringify(element._sendEvent.getCall(0).args[1]), validRssJson);
+
+              done();
+            });
+          });
+
+          test("should handle an invalid response from feed-parser", done => {
+            window.fetch.resolves(new Response(invalidRssJson));
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+
+              // Should log the received data
+              assert.equal(element.log.getCall(2).args[1], "rss-data-error");
+              assert.deepEqual(element.log.getCall(2).args[2], { error: JSON.parse(invalidRssJson).Error });
+              // Should send a data-update event
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: JSON.parse(invalidRssJson).Error });
+
+              done();
+            });
+          });
+
+          test("should handle failure to connect to feed-parser", done => {
+            let errorMessage = "Failed to connect to feed-parser";
+
+            window.fetch.rejects({ message: errorMessage });
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+
+              // Should log the request error data
+              assert.equal(element.log.getCall(2).args[1], "rss-request-error");
+              assert.deepEqual(element.log.getCall(2).args[2], { error: errorMessage });
+              // Should send a request-error event
+              assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
+
+              done();
+            });
+          });
+        });
       });
     </script>
-
   </body>
 </html>
