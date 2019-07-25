@@ -153,7 +153,7 @@
 
               // Should log the received data
               assert.equal(element.log.getCall(2).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(2).args[2], validRssJson);
+              assert.deepEqual(element.log.getCall(2).args[2], {});
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
@@ -180,7 +180,7 @@
 
               // Should log the received data
               assert.equal(element.log.getCall(2).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(2).args[2], largeRssJson.slice(0, 15));
+              assert.deepEqual(element.log.getCall(2).args[2], {});
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
