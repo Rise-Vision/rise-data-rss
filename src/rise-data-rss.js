@@ -95,11 +95,8 @@ export default class RiseDataRss extends RiseElement {
       if (JSON.stringify(this.feedData) !== JSON.stringify(data)) {
         this._setFeedData(data.slice(0, this.maxItems));
 
-        super.log("info", "rss-data-update", this.feedData);
+        super.log("info", "rss-data-update", {});
         this._sendEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
-      }
-      else {
-        super.log("info", "rss-data-unchanged");
       }
     }
     else {
