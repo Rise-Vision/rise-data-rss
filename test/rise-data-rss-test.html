@@ -48,7 +48,7 @@
         };
         let sandbox = sinon.createSandbox();
         let element;
-        let fetchMixin, cacheMixin, loggerMixin;
+        let fetchMixin, cacheMixin, riseElement, loggerMixin;
 
         setup(() => {
           element = fixture("test-block");
@@ -56,8 +56,11 @@
           // RiseDataRss => RiseFetchMixin => RiseCacheMixin => RiseElement => LoggerMixin
           fetchMixin = element.__proto__.__proto__;
           cacheMixin = element.__proto__.__proto__.__proto__;
+          riseElement = element.__proto__.__proto__.__proto__.__proto__;
           loggerMixin = element.__proto__.__proto__.__proto__.__proto__.__proto__;
 
+          sandbox.spy(riseElement, '_sendEvent');
+          sandbox.stub(riseElement, '_setUptimeError');
           sandbox.stub(loggerMixin, "initLogger");
           sandbox.stub(loggerMixin, "log");
           sandbox.stub(window, "fetch");
@@ -140,8 +143,6 @@
 
           setup(() => {
             sandbox.stub(cacheMixin, "putCache").resolves();
-            sandbox.stub(element, "_sendRssEvent");
-            sandbox.stub(element, "_setUptimeError");
 
             element.dispatchEvent(new CustomEvent("start"));
           });
@@ -152,14 +153,15 @@
             element.feedUrl = sampleFeedUrl;
 
             setTimeout(() => {
+              assert.isTrue(riseElement._setUptimeError.calledWith(false));
               assert.isFalse(window.fetch.called);
 
               // Should log the received data
               assert.equal(element.log.getCall(3).args[1], "rss-data-update");
               assert.deepEqual(element.log.getCall(3).args[2], {});
               // Should send a data-update event
-              assert.equal(element._sendRssEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendRssEvent.getCall(0).args[1], validRssJson);
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
 
               done();
             }, 30);
@@ -172,6 +174,8 @@
             element.feedUrl = sampleFeedUrl;
 
             setTimeout(() => {
+              assert.isTrue(riseElement._setUptimeError.calledWith(false));
+
               assert.isTrue(window.fetch.called);
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
@@ -179,8 +183,8 @@
               assert.equal(element.log.getCall(3).args[1], "rss-data-update");
               assert.deepEqual(element.log.getCall(3).args[2], {});
               // Should send a data-update event
-              assert.equal(element._sendRssEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendRssEvent.getCall(0).args[1], validRssJson);
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
 
               done();
             }, 30);
@@ -204,12 +208,14 @@
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
               setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(false));
+
                 // Should log the received data
                 assert.equal(element.log.getCall(3).args[1], "rss-data-update");
                 assert.deepEqual(element.log.getCall(3).args[2], {});
                 // Should send a data-update event
-                assert.equal(element._sendRssEvent.getCall(0).args[0], "data-update");
-                assert.deepEqual(element._sendRssEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
+                assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
 
                 done();
               }, 20);
@@ -227,12 +233,14 @@
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
               setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(true));
+
                 // Should log the received data
                 assert.equal(element.log.getCall(3).args[1], "rss-data-error");
                 assert.deepEqual(element.log.getCall(3).args[2], { error: invalidRssJson.Error });
                 // Should send a data-update event
-                assert.equal(element._sendRssEvent.getCall(0).args[0], "data-error");
-                assert.deepEqual(element._sendRssEvent.getCall(0).args[1], { error: invalidRssJson.Error });
+                assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
 
                 done();
               }, 20);
@@ -251,12 +259,14 @@
               assert.isTrue(window.fetch.called);
 
               setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(true));
+
                 // Should log the request error data
                 assert.equal(element.log.getCall(2).args[1], "rss-request-error");
                 assert.deepEqual(element.log.getCall(2).args[2], { error: errorMessage });
                 // Should send a request-error event
-                assert.equal(element._sendRssEvent.getCall(0).args[0], "request-error");
-                assert.deepEqual(element._sendRssEvent.getCall(0).args[1], { error: errorMessage });
+                assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
 
                 done();
               }, 20);
@@ -278,6 +288,8 @@
             element.feedUrl = sampleFeedUrl;
 
             setTimeout(() => {
+              assert.isTrue(riseElement._setUptimeError.calledWith(false));
+
               assert.isTrue(window.fetch.called);
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
@@ -285,8 +297,8 @@
               assert.equal(element.log.getCall(2).args[1], "rss-data-update");
               assert.deepEqual(element.log.getCall(2).args[2], {});
               // Should send a data-update event
-              assert.equal(element._sendRssEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendRssEvent.getCall(0).args[1], validRssJson);
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
 
               done();
             }, 30);
