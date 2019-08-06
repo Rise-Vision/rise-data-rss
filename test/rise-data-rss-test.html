@@ -58,7 +58,6 @@
           cacheMixin = element.__proto__.__proto__.__proto__;
           loggerMixin = element.__proto__.__proto__.__proto__.__proto__.__proto__;
 
-          sandbox.stub(cacheMixin, "initCache");
           sandbox.stub(loggerMixin, "initLogger");
           sandbox.stub(loggerMixin, "log");
           sandbox.stub(window, "fetch");
@@ -262,6 +261,35 @@
                 done();
               }, 20);
             });
+          });
+
+          test("should use cached data when it fails to connect to feed-parser", done => {
+            let errorMessage = "Failed to connect to feed-parser";
+
+            window.fetch.rejects({ message: errorMessage });
+            sandbox.stub(cacheMixin, "getCache").callsFake(function (url, ignoreExpiration) {
+              if (ignoreExpiration) {
+                return Promise.resolve(new Response(JSON.stringify(validRssJson)));
+              } else {
+                return Promise.reject();
+              }
+            });
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+
+              // Should log the received data
+              assert.equal(element.log.getCall(2).args[1], "rss-data-update");
+              assert.deepEqual(element.log.getCall(2).args[2], {});
+              // Should send a data-update event
+              assert.equal(element._sendRssEvent.getCall(0).args[0], "data-update");
+              assert.deepEqual(element._sendRssEvent.getCall(0).args[1], validRssJson);
+
+              done();
+            }, 30);
           });
         });
       });
