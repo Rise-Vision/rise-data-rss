@@ -235,10 +235,10 @@
               setTimeout(() => {
                 assert.isTrue(riseElement._setUptimeError.calledWith(true));
 
-                // Should log the received data
+                // Should log the error data
                 assert.equal(element.log.getCall(3).args[1], "rss-data-error");
                 assert.deepEqual(element.log.getCall(3).args[2], { error: invalidRssJson.Error });
-                // Should send a data-update event
+                // Should send a data-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
 
@@ -251,6 +251,7 @@
             let errorMessage = "Failed to connect to feed-parser";
 
             sandbox.stub(cacheMixin, "getCache").rejects();
+            sandbox.stub(fetchMixin, "_isOffline").resolves(false);
             window.fetch.rejects({ message: errorMessage });
 
             element.feedUrl = sampleFeedUrl;
@@ -273,35 +274,28 @@
             });
           });
 
-          test("should use cached data when it fails to connect to feed-parser", done => {
+          test("should handle failure to connect to feed-parser and not log if offline", done => {
             let errorMessage = "Failed to connect to feed-parser";
 
+            sandbox.stub(element, "_handleResponse");
+            sandbox.stub(cacheMixin, "getCache").rejects();
+            sandbox.stub(fetchMixin, "_isOffline").resolves(true);
             window.fetch.rejects({ message: errorMessage });
-            sandbox.stub(cacheMixin, "getCache").callsFake(function (url, ignoreExpiration) {
-              if (ignoreExpiration) {
-                return Promise.resolve(new Response(JSON.stringify(validRssJson)));
-              } else {
-                return Promise.reject();
-              }
-            });
 
             element.feedUrl = sampleFeedUrl;
 
             setTimeout(() => {
-              assert.isTrue(riseElement._setUptimeError.calledWith(false));
-
               assert.isTrue(window.fetch.called);
-              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
-              // Should log the received data
-              assert.equal(element.log.getCall(2).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(2).args[2], {});
-              // Should send a data-update event
-              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
+              setTimeout(() => {
+                assert.isFalse(riseElement._setUptimeError.called);
+                assert.isFalse(element.log.calledThrice); // start | rss-start
+                assert.isFalse(element._handleResponse.called);
+                assert.isFalse(element._sendEvent.called);
 
-              done();
-            }, 30);
+                done();
+              }, 20);
+            });
           });
         });
       });

@@ -62,13 +62,12 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     super.initFetch({
       refresh: 1000 * 60,
       retry: 1000 * 60,
-      cooldown: 1000 * 60 * 10,
-      useCacheIfOffline: true
+      cooldown: 1000 * 60 * 10
     }, this._handleResponse, this._handleError);
 
     super.initCache({
       name: this.tagName.toLowerCase(),
-      preserveExpired: true
+      expiry: -1
     });    
   }
 
@@ -128,8 +127,10 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
   _handleFetchError(err) {
     let error = err ? err.message : null;
 
-    super.log("error", "rss-request-error", { error });
-    this._sendRssEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
+    if (!(err && err.isOffline)) {
+      super.log("error", "rss-request-error", { error });
+      this._sendRssEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
+    }
   }
 
   _sendRssEvent(name, detail) {
