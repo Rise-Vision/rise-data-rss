@@ -157,8 +157,8 @@
               assert.isFalse(window.fetch.called);
 
               // Should log the received data
-              assert.equal(element.log.getCall(3).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(3).args[2], {});
+              assert.equal(element.log.getCall(1).args[1], "data received");
+              assert.deepEqual(element.log.getCall(1).args[2], { cached: true });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
@@ -180,8 +180,8 @@
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
               // Should log the received data
-              assert.equal(element.log.getCall(3).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(3).args[2], {});
+              assert.equal(element.log.getCall(1).args[1], "data received");
+              assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
@@ -211,8 +211,8 @@
                 assert.isTrue(riseElement._setUptimeError.calledWith(false));
 
                 // Should log the received data
-                assert.equal(element.log.getCall(3).args[1], "rss-data-update");
-                assert.deepEqual(element.log.getCall(3).args[2], {});
+                assert.equal(element.log.getCall(1).args[1], "data received");
+                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
                 // Should send a data-update event
                 assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
@@ -236,8 +236,8 @@
                 assert.isTrue(riseElement._setUptimeError.calledWith(true));
 
                 // Should log the error data
-                assert.equal(element.log.getCall(3).args[1], "rss-data-error");
-                assert.deepEqual(element.log.getCall(3).args[2], { error: invalidRssJson.Error });
+                assert.equal(element.log.getCall(1).args[1], "data received");
+                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
                 // Should send a data-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
@@ -252,6 +252,8 @@
 
             sandbox.stub(cacheMixin, "getCache").rejects();
             sandbox.stub(fetchMixin, "_isOffline").resolves(false);
+            element.fetchConfig.count = 0;
+
             window.fetch.rejects({ message: errorMessage });
 
             element.feedUrl = sampleFeedUrl;
@@ -263,8 +265,8 @@
                 assert.isTrue(riseElement._setUptimeError.calledWith(true));
 
                 // Should log the request error data
-                assert.equal(element.log.getCall(2).args[1], "rss-request-error");
-                assert.deepEqual(element.log.getCall(2).args[2], { error: errorMessage });
+                assert.equal(element.log.getCall(1).args[1], "request error");
+                assert.deepEqual(element.log.getCall(1).args[2], { error: errorMessage });
                 // Should send a request-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
@@ -289,7 +291,7 @@
 
               setTimeout(() => {
                 assert.isFalse(riseElement._setUptimeError.called);
-                assert.isFalse(element.log.calledThrice); // start | rss-start
+                assert.isTrue(element.log.calledOnce);
                 assert.isFalse(element._handleResponse.called);
                 assert.isFalse(element._sendEvent.called);
 

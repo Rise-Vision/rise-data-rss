@@ -77,8 +77,6 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     if (this._initialStart) {
       this._initialStart = false;
 
-      super.log("info", "rss-start");
-
       if (this.feedUrl) {
         this._loadFeedData();
       }
@@ -103,8 +101,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
   _handleResponse(response) {
     response.json()
-      .then(this._processRssData.bind(this))
-      .catch(this._handleFetchError.bind(this));
+      .then(this._processRssData.bind(this));
   }
 
   _processRssData(data) {
@@ -112,23 +109,20 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       if (!isEqual(this.feedData, data)) {
         this._setFeedData(data.slice(0, this.maxItems));
 
-        super.log("info", "rss-data-update", {});
         this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
       }
     }
     else {
       let error = data.Error;
 
-      super.log("error", "rss-data-error", { error });
       this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
     }
   }
 
-  _handleFetchError(err) {
+  _handleError(err) {
     let error = err ? err.message : null;
 
     if (!(err && err.isOffline)) {
-      super.log("error", "rss-request-error", { error });
       this._sendRssEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
     }
   }
