@@ -252,7 +252,7 @@
 
             sandbox.stub(cacheMixin, "getCache").rejects();
             sandbox.stub(fetchMixin, "_isOffline").resolves(false);
-            element.fetchConfig.count = 0;
+            sandbox.stub(fetchMixin, "_shouldRetryWithErrorHandling").returns(true);
 
             window.fetch.rejects({ message: errorMessage });
 
@@ -282,6 +282,7 @@
             sandbox.stub(element, "_handleResponse");
             sandbox.stub(cacheMixin, "getCache").rejects();
             sandbox.stub(fetchMixin, "_isOffline").resolves(true);
+            sandbox.stub(fetchMixin, "_shouldRetryWithErrorHandling").returns(true);
             window.fetch.rejects({ message: errorMessage });
 
             element.feedUrl = sampleFeedUrl;
@@ -291,7 +292,7 @@
 
               setTimeout(() => {
                 assert.isFalse(riseElement._setUptimeError.called);
-                assert.isTrue(element.log.calledOnce);
+                assert.isTrue(element.log.calledTwice);
                 assert.isFalse(element._handleResponse.called);
                 assert.isFalse(element._sendEvent.called);
 
