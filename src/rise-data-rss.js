@@ -1,9 +1,14 @@
 import { RiseElement } from "rise-common-component/src/rise-element.js";
+import { CacheMixin } from "rise-common-component/src/cache-mixin.js";
+import { FetchMixin } from "rise-common-component/src/fetch-mixin.js";
+
 import { rssConfig } from "./rise-data-rss-config.js";
 import { version } from "./rise-data-rss-version.js";
 import isEqual from "lodash-es/isEqual";
 
-export default class RiseDataRss extends RiseElement {
+const fetchBase = CacheMixin( RiseElement );
+
+export default class RiseDataRss extends FetchMixin(fetchBase) {
 
   static get properties() {
     return {
@@ -51,14 +56,19 @@ export default class RiseDataRss extends RiseElement {
     this._initialStart = true;
   }
 
-  _getUrl() {
-    return rssConfig.feedParserURL + "/" + this.feedUrl;
-  }
+  ready() {
+    super.ready();
 
-  _feedUrlChanged() {
-    if (!this._initialStart && this.feedUrl) {
-      this._requestData();
-    }
+    super.initFetch({
+      refresh: 1000 * 60 * 5,
+      retry: 1000 * 60 * 5,
+      cooldown: 1000 * 60 * 10
+    }, this._handleResponse, this._handleError);
+
+    super.initCache({
+      name: this.tagName.toLowerCase(),
+      expiry: -1
+    });    
   }
 
   _handleStart() {
@@ -67,52 +77,73 @@ export default class RiseDataRss extends RiseElement {
     if (this._initialStart) {
       this._initialStart = false;
 
-      super.log("info", "rss-start");
-
       if (this.feedUrl) {
-        this._requestData();
+        this._loadFeedData();
       }
     }
   }
 
-  _requestData() {
-    fetch(this._getUrl(), {
-      headers: { "X-Requested-With": "rise-data-rss" }
-    })
-    .then(resp => {
-      return resp.json();
-    })
-    .then(data => {
-      this._handleResponse(data);
-    })
-    .catch(err => {
-      this._handleFetchError(err);
-    });
+  _getUrl() {
+    return rssConfig.feedParserURL + "/" + this.feedUrl;
   }
 
-  _handleResponse(data) {
+  _feedUrlChanged() {
+    this._loadFeedData();
+  }
+
+  _loadFeedData() {
+    if (!this._initialStart && this.feedUrl) {
+      super.fetch(this._getUrl(), {
+        headers: { "X-Requested-With": "rise-data-rss" }
+      });
+    }
+  }
+
+  _handleResponse(response) {
+    response.json()
+      .then(this._processRssData.bind(this));
+  }
+
+  _processRssData(data) {
     if (!data.Error) {
-      // Temporary solution; this should use a more robust comparison method such as deep-equal
       if (!isEqual(this.feedData, data)) {
         this._setFeedData(data.slice(0, this.maxItems));
 
-        super.log("info", "rss-data-update", {});
-        this._sendEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
+        this.log( "info", "data provided" );
+
+        this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
       }
     }
     else {
       let error = data.Error;
 
-      super.log("error", "rss-data-error", { error });
-      this._sendEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
+      this.log( "error", "data error", { error });
+
+      this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
     }
   }
 
-  _handleFetchError(err) {
+  _handleError(err) {
     let error = err ? err.message : null;
 
-    super.log("error", "rss-request-error", { error });
-    this._sendEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
+    if (!(err && err.isOffline)) {
+      this._sendRssEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
+    }
+  }
+
+  _sendRssEvent(name, detail) {
+    super._sendEvent(name, detail);
+
+    switch (name) {
+    case RiseDataRss.EVENT_REQUEST_ERROR:
+    case RiseDataRss.EVENT_DATA_ERROR:
+      super._setUptimeError(true);
+      break;
+    case RiseDataRss.EVENT_DATA_UPDATE:
+      super._setUptimeError(false);
+      break;
+    default:
+    }
   }
 }
 

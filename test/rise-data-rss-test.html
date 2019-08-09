@@ -48,16 +48,21 @@
         };
         let sandbox = sinon.createSandbox();
         let element;
-        let logger;
+        let fetchMixin, cacheMixin, riseElement, loggerMixin;
 
         setup(() => {
           element = fixture("test-block");
 
-          // RiseDataRss => RiseElement => LoggerMixin
-          logger = element.__proto__.__proto__.__proto__;
+          // RiseDataRss => RiseFetchMixin => RiseCacheMixin => RiseElement => LoggerMixin
+          fetchMixin = element.__proto__.__proto__;
+          cacheMixin = element.__proto__.__proto__.__proto__;
+          riseElement = element.__proto__.__proto__.__proto__.__proto__;
+          loggerMixin = element.__proto__.__proto__.__proto__.__proto__.__proto__;
 
-          sandbox.stub(logger, "initLogger");
-          sandbox.stub(logger, "log");
+          sandbox.spy(riseElement, '_sendEvent');
+          sandbox.stub(riseElement, '_setUptimeError');
+          sandbox.stub(loggerMixin, "initLogger");
+          sandbox.stub(loggerMixin, "log");
           sandbox.stub(window, "fetch");
         });
 
@@ -116,50 +121,75 @@
 
         suite("'start' event", () => {
           test("should request data only after start has been called", done => {
-            sandbox.stub(element, "_requestData");
+            sandbox.stub(fetchMixin, "fetch");
 
             element.feedUrl = "sampleFeedUrl";
 
             setTimeout(() => {
-              assert.isFalse(element._requestData.called);
+              assert.isFalse(fetchMixin.fetch.called);
 
               element.dispatchEvent(new CustomEvent("start"));
 
               setTimeout(() => {
-                assert.isTrue(element._requestData.called);
+                assert.isTrue(fetchMixin.fetch.called);
                 done();
               });
             });
           });
         });
 
-        suite("_requestData", () => {
+        suite("_loadFeedData", () => {
           let response;
 
           setup(() => {
-            sandbox.stub(element, "_sendEvent");
+            sandbox.stub(cacheMixin, "putCache").resolves();
 
             element.dispatchEvent(new CustomEvent("start"));
           });
 
-          test("should handle a valid response from feed-parser", done => {
-            window.fetch.resolves(new Response(JSON.stringify(validRssJson)));
+          test("should handle a valid response from cache", done => {
+            sandbox.stub(cacheMixin, "getCache").resolves(new Response(JSON.stringify(validRssJson)));
 
             element.feedUrl = sampleFeedUrl;
 
             setTimeout(() => {
-              assert.isTrue(window.fetch.called);
-              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+              assert.isTrue(riseElement._setUptimeError.calledWith(false));
+              assert.isFalse(window.fetch.called);
 
               // Should log the received data
-              assert.equal(element.log.getCall(2).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(2).args[2], {});
+              assert.equal(element.log.getCall(1).args[1], "data received");
+              assert.deepEqual(element.log.getCall(1).args[2], { cached: true });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
 
               done();
-            });
+            }, 30);
+          });
+
+          test("should handle a valid response from feed-parser", done => {
+            sandbox.stub(cacheMixin, "getCache").rejects();
+            window.fetch.resolves(new Response(JSON.stringify(validRssJson)));
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(riseElement._setUptimeError.calledWith(false));
+
+              assert.isTrue(window.fetch.called);
+              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+
+              // Should log the received data
+              assert.equal(element.log.getCall(1).args[1], "data received");
+              assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+              // Should log that it provided new data to the client
+              assert.equal(element.log.getCall(2).args[1], "data provided");
+              // Should send a data-update event
+              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
+
+              done();
+            }, 30);
           });
 
           test("should only return the first 15 valid items", done => {
@@ -169,6 +199,7 @@
               }
             });
 
+            sandbox.stub(cacheMixin, "getCache").rejects();
             window.fetch.resolves(new Response(JSON.stringify(largeRssJson)));
 
             element.maxItems = 15;
@@ -178,18 +209,23 @@
               assert.isTrue(window.fetch.called);
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
-              // Should log the received data
-              assert.equal(element.log.getCall(2).args[1], "rss-data-update");
-              assert.deepEqual(element.log.getCall(2).args[2], {});
-              // Should send a data-update event
-              assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
+              setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(false));
 
-              done();
+                // Should log the received data
+                assert.equal(element.log.getCall(1).args[1], "data received");
+                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                // Should send a data-update event
+                assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
+
+                done();
+              }, 20);
             });
           });
 
           test("should handle an invalid response from feed-parser", done => {
+            sandbox.stub(cacheMixin, "getCache").rejects();
             window.fetch.resolves(new Response(JSON.stringify(invalidRssJson)));
 
             element.feedUrl = sampleFeedUrl;
@@ -198,19 +234,30 @@
               assert.isTrue(window.fetch.called);
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
-              // Should log the received data
-              assert.equal(element.log.getCall(2).args[1], "rss-data-error");
-              assert.deepEqual(element.log.getCall(2).args[2], { error: invalidRssJson.Error });
-              // Should send a data-update event
-              assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
-              assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
+              setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(true));
 
-              done();
+                // Should log the received data
+                assert.equal(element.log.getCall(1).args[1], "data received");
+                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                // Should log the error data
+                assert.equal(element.log.getCall(2).args[1], "data error");
+                assert.deepEqual(element.log.getCall(2).args[2], { error: invalidRssJson.Error });
+                // Should send a data-error event
+                assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
+
+                done();
+              }, 20);
             });
           });
 
           test("should handle failure to connect to feed-parser", done => {
             let errorMessage = "Failed to connect to feed-parser";
+
+            sandbox.stub(cacheMixin, "getCache").rejects();
+            sandbox.stub(fetchMixin, "_isOffline").resolves(false);
+            sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
 
             window.fetch.rejects({ message: errorMessage });
 
@@ -219,14 +266,43 @@
             setTimeout(() => {
               assert.isTrue(window.fetch.called);
 
-              // Should log the request error data
-              assert.equal(element.log.getCall(2).args[1], "rss-request-error");
-              assert.deepEqual(element.log.getCall(2).args[2], { error: errorMessage });
-              // Should send a request-error event
-              assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
-              assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
+              setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(true));
 
-              done();
+                // Should log the request error data
+                assert.equal(element.log.getCall(1).args[1], "request error");
+                assert.deepEqual(element.log.getCall(1).args[2], { error: errorMessage });
+                // Should send a request-error event
+                assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
+
+                done();
+              }, 20);
+            });
+          });
+
+          test("should handle failure to connect to feed-parser and not log if offline", done => {
+            let errorMessage = "Failed to connect to feed-parser";
+
+            sandbox.stub(element, "_handleResponse");
+            sandbox.stub(cacheMixin, "getCache").rejects();
+            sandbox.stub(fetchMixin, "_isOffline").resolves(true);
+            sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
+            window.fetch.rejects({ message: errorMessage });
+
+            element.feedUrl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+
+              setTimeout(() => {
+                assert.isFalse(riseElement._setUptimeError.called);
+                assert.isTrue(element.log.calledTwice);
+                assert.isFalse(element._handleResponse.called);
+                assert.isFalse(element._sendEvent.called);
+
+                done();
+              }, 20);
             });
           });
         });

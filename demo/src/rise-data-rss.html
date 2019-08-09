@@ -39,12 +39,19 @@
       max-items="15">
   </rise-data-rss>
 
+  <div id="rssTitles"></div>
+
   <script>
     function configureComponents() {
       const riseDataRSS01 = document.querySelector('#rise-data-rss-01');
 
       riseDataRSS01.addEventListener("data-update", data => {
         console.log("Received feed-parser data", data);
+
+        var header = "<h3>Response received at: " + new Date() + "</h3>";
+        var titles = data.detail.map(item => { return "<p>" + item.title + "</p>"; }).join("");
+
+        document.querySelector('#rssTitles').innerHTML = header + titles;
       });
 
       riseDataRSS01.addEventListener("data-error", error => {
