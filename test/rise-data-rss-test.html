@@ -182,6 +182,8 @@
               // Should log the received data
               assert.equal(element.log.getCall(1).args[1], "data received");
               assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+              // Should log that it provided new data to the client
+              assert.equal(element.log.getCall(2).args[1], "data provided");
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);

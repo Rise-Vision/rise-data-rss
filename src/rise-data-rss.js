@@ -109,6 +109,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       if (!isEqual(this.feedData, data)) {
         this._setFeedData(data.slice(0, this.maxItems));
 
+        this.log( "info", "data provided" );
+
         this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
       }
     }
