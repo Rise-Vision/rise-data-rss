@@ -115,6 +115,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     else {
       let error = data.Error;
 
+      this.log( "error", "data error", { error });
+
       this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
     }
   }
