@@ -60,8 +60,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     super.ready();
 
     super.initFetch({
-      refresh: 1000 * 60,
-      retry: 1000 * 60,
+      refresh: 1000 * 60 * 5,
+      retry: 1000 * 60 * 5,
       cooldown: 1000 * 60 * 10
     }, this._handleResponse, this._handleError);
 
