@@ -30,6 +30,8 @@ This component receives the following list of attributes:
 - **max-items**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements, up to the maximum, are retrieved. Defaults to 25, which is also the maximum.
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the Template Editor.
 
+The feed is refreshed every 5 minutes. The refresh rate is not modifiable.
+
 This component does not support PUD; it will need to be handled by Designers on a per Template basis.
 
 ### Events
@@ -49,10 +51,18 @@ The component listens for the following events:
 
 The component logs the following events to BQ:
 
-- **rss-start**: The component receives the start event and commences execution.
-- **rss-data-update**: The component detected new data in the feed and reported it to the consumer.
-- **rss-feed-parser-error**: The component was not able to connect to feed-parser.
-- **rss-data-error**: The component received an error from feed-parser. The details of the error will be provided as part of the log.
+- **start received**: The component receives the start event and commences execution.
+- **data received**: The component successfully retrieved data from the feed.
+- **data provided**: The component detected new data from the feed and provided it to the client.
+- **data error**: The component received an error from feed-parser. The details of the error will be provided as part of the log.
+- **request error**: The component was not able to connect to feed-parser.
+- **client offline**: The component was not able to connect to feed-parser because the client has connectivity issues.
+
+### Offline play
+
+The component supports offline play out of the box, relying on the browser for Cache API availability.
+
+Every time a successful request to the feed is made, the response is stored locally in the cache. In case connectivity is lost, the latest cached version will be available. Upon a Player restart, if a cached version exists it will be used until connectivity is restored.
 
 ## Built With
 - [Polymer 3](https://www.polymer-project.org/)
