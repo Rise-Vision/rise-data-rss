@@ -70,10 +70,7 @@
         max-items="25">
     </rise-data-rss>
 
-    <div id="rssFeed" class="feedContainer">
-      <div id="rssHeader"></div>
-      <div id="rssItem"></div>
-    </div>
+    <div id="rssFeed" class="feedContainer"></div>
     <div id="rssErrors" class="errorsContainer"></div>
 
     <script>
@@ -93,19 +90,15 @@
             tags.push(`<div><img src="${item.image.url}" /></div>`);
           }
 
-          document.querySelector('#rssItem').innerHTML = `<div>${tags.join("")}</div>`;
+          document.querySelector('#rssFeed').innerHTML = `<div>${tags.join("")}</div>`;
         }
 
         riseDataRSS01.addEventListener("data-update", data => {
-          var header = `<h3>Response received at: ${new Date().toLocaleString()}</h3>`;
-
           console.log("Received feed-parser data", data);
 
           document.querySelector('#rssErrors').style.display = "none";
           document.querySelector('#rssFeed').style.display = "block";
-
-          document.querySelector('#rssHeader').innerHTML = header;
-          document.querySelector('#rssItem').innerHTML = "";
+          document.querySelector('#rssFeed').innerHTML = "";
 
           currentData = data.detail;
           currentItem = 0;
