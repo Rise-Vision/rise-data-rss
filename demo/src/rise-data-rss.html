@@ -35,6 +35,7 @@
       border: solid 1px black;
       width: 90%;
       padding-left: 20px;
+      font-size: 2em;
     }
 
     .errorsContainer {
@@ -51,41 +52,71 @@
 </head>
 
 <body>
-
   <rise-data-rss
       id="rise-data-rss-01" label="Test Feed"
       feed-url="https://www.feedforall.com/sample.xml"
       max-items="15">
   </rise-data-rss>
 
-  <div id="rssFeed" class="feedContainer"></div>
+  <div id="rssFeed" class="feedContainer">
+    <div id="rssHeader"></div>
+    <div id="rssItem"></div>
+  </div>
   <div id="rssErrors" class="errorsContainer"></div>
 
   <script>
     function configureComponents() {
       const riseDataRSS01 = document.querySelector('#rise-data-rss-01');
+      var feedTimer = null;
+      var currentData = null;
+      var currentItem = 0;
+
+      function _showCurrent() {
+        let item = currentData[currentItem];
+        let tags = [];
+
+        tags.push(`<p>${item.title}</p>`);
+        tags.push(`<p class="itemDescription">${item.description}</p>`);
+
+        if (item.image && item.image.url) {
+          tags.push(`<div><img src="${item.image.url}" /></div>`);
+        }
+
+        document.querySelector('#rssItem').innerHTML = `<div>${tags.join("")}</div>`;
+      }
 
       riseDataRSS01.addEventListener("data-update", data => {
-        console.log("Received feed-parser data", data);
-
         var header = `<h3>Response received at: ${new Date().toLocaleString()}</h3>`;
-        var feedItems = data.detail.map(item => {
-          let tags = [];
 
-          tags.push(`<p>${item.title}</p>`);
-          tags.push(`<p class="itemDescription">${item.description}</p>`);
-
-          if (item.image && item.image.url) {
-            tags.push(`<div><img src="${item.image.url}" /></div>`);
-          }
-
-          return `<div>${tags.join("")}</div>`;
-        }).join("");
+        console.log("Received feed-parser data", data);
 
         document.querySelector('#rssErrors').style.display = "none";
         document.querySelector('#rssFeed').style.display = "block";
 
-        document.querySelector('#rssFeed').innerHTML = header + feedItems;
+        document.querySelector('#rssHeader').innerHTML = header;
+        document.querySelector('#rssItem').innerHTML = "";
+
+        currentData = data.detail;
+        currentItem = 0;
+
+        if (feedTimer) {
+          clearInterval(feedTimer);
+          feedTimer = null;
+        }
+
+        if (currentData.length > 0) {
+          feedTimer = setInterval(() => {
+            if (currentItem < currentData.length) {
+              currentItem++;
+            } else {
+              currentItem = 0;
+            }
+
+            _showCurrent();
+          }, 5 * 1000);
+
+          _showCurrent();
+        }
       });
 
       riseDataRSS01.addEventListener("data-error", error => {
@@ -125,6 +156,5 @@
   <script>
     RisePlayerConfiguration.configure();
   </script>
-
 </body>
 </html>

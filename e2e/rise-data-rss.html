@@ -42,6 +42,26 @@
         }
       }
     </script>
+    <style>
+      .feedContainer {
+        background-color: lightblue;
+        border: solid 1px black;
+        width: 90%;
+        padding-left: 20px;
+        font-size: 2em;
+      }
+
+      .errorsContainer {
+        background-color: lightcoral;
+        border: solid 1px black;
+        width: 90%;
+        padding-left: 20px;
+      }
+
+      .itemDescription {
+        font-size: 70%;
+      }
+    </style>
   </head>
   <body>
     <rise-data-rss
@@ -50,8 +70,62 @@
         max-items="25">
     </rise-data-rss>
 
+    <div id="rssFeed" class="feedContainer"></div>
+    <div id="rssErrors" class="errorsContainer"></div>
+
     <script>
       function configureComponents() {
+        const riseDataRSS01 = document.querySelector('#rise-data-rss-01');
+        var currentData = null;
+        var currentItem = 0;
+
+        function _showCurrent() {
+          let item = currentData[currentItem];
+          let tags = [];
+
+          tags.push(`<p>${item.title}</p>`);
+          tags.push(`<p class="itemDescription">${item.description}</p>`);
+
+          if (item.image && item.image.url) {
+            tags.push(`<div><img src="${item.image.url}" /></div>`);
+          }
+
+          document.querySelector('#rssFeed').innerHTML = `<div>${tags.join("")}</div>`;
+        }
+
+        riseDataRSS01.addEventListener("data-update", data => {
+          console.log("Received feed-parser data", data);
+
+          document.querySelector('#rssErrors').style.display = "none";
+          document.querySelector('#rssFeed').style.display = "block";
+          document.querySelector('#rssFeed').innerHTML = "";
+
+          currentData = data.detail;
+          currentItem = 0;
+
+          if (currentData.length > 0) {
+            _showCurrent();
+          }
+        });
+
+        riseDataRSS01.addEventListener("data-error", error => {
+          console.log("Received invalid feed-parser data", error);
+
+          document.querySelector('#rssErrors').style.display = "block";
+          document.querySelector('#rssFeed').style.display = "none";
+
+          document.querySelector('#rssErrors').innerHTML = JSON.stringify(error);
+        });
+
+        riseDataRSS01.addEventListener("request-error", error => {
+          console.log("Failed to connect to feed-parser", error);
+
+          document.querySelector('#rssErrors').style.display = "block";
+          document.querySelector('#rssFeed').style.display = "none";
+
+          document.querySelector('#rssErrors').innerHTML = JSON.stringify(error);
+        });
+
         console.log('Rise components ready');
       }
 
