@@ -13,8 +13,8 @@ The below illustrates simple usage of the component.
 ```
   <rise-data-rss
       id="rise-data-rss-01" label="Test Feed"
-      feed-url="https://www.feedforall.com/sample.xml"
-      max-items="15">
+      feedurl="https://www.feedforall.com/sample.xml"
+      maxitems="15">
   </rise-data-rss>
 ```
 
@@ -26,8 +26,8 @@ This component receives the following list of attributes:
 
 - **id**: ( string ): Unique HTMLElement id.
 - **label**: (string): Assigns the label to use for the instance of the component in Template Editor.
-- **feed-url**: (string / required): The url to the RSS feed to be used for this instance.
-- **max-items**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements, up to the maximum, are retrieved. Defaults to 25, which is also the maximum.
+- **feedurl**: (string / required): The url to the RSS feed to be used for this instance.
+- **maxitems**: (number / optional): The maximum number of elements to retrieve from the RSS feed. If the attribute is empty or zero, all the elements, up to the maximum, are retrieved. Defaults to 25, which is also the maximum.
 - **non-editable**: ( empty / optional ): If present, it indicates this component is not available for customization in the Template Editor.
 
 The feed is refreshed every 5 minutes. The refresh rate is not modifiable.
