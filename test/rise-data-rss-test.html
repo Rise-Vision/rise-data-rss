@@ -71,12 +71,12 @@
         });
 
         suite("properties", () => {
-          test("should not set feedUrl", () => {
-            assert.notOk(element.feedUrl);
+          test("should not set feedurl", () => {
+            assert.notOk(element.feedurl);
           });
 
-          test("should set maxItems", () => {
-            assert.equal(element.maxItems, 25);
+          test("should set maxitems", () => {
+            assert.equal(element.maxitems, 25);
           });
         });
 
@@ -123,7 +123,7 @@
           test("should request data only after start has been called", done => {
             sandbox.stub(fetchMixin, "fetch");
 
-            element.feedUrl = "sampleFeedUrl";
+            element.feedurl = "sampleFeedUrl";
 
             setTimeout(() => {
               assert.isFalse(fetchMixin.fetch.called);
@@ -150,7 +150,7 @@
           test("should handle a valid response from cache", done => {
             sandbox.stub(cacheMixin, "getCache").resolves(new Response(JSON.stringify(validRssJson)));
 
-            element.feedUrl = sampleFeedUrl;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(riseElement._setUptimeError.calledWith(false));
@@ -171,7 +171,7 @@
             sandbox.stub(cacheMixin, "getCache").rejects();
             window.fetch.resolves(new Response(JSON.stringify(validRssJson)));
 
-            element.feedUrl = sampleFeedUrl;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(riseElement._setUptimeError.calledWith(false));
@@ -202,8 +202,8 @@
             sandbox.stub(cacheMixin, "getCache").rejects();
             window.fetch.resolves(new Response(JSON.stringify(largeRssJson)));
 
-            element.maxItems = 15;
-            element.feedUrl = sampleFeedUrl;
+            element.maxitems = 15;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(window.fetch.called);
@@ -228,7 +228,7 @@
             sandbox.stub(cacheMixin, "getCache").rejects();
             window.fetch.resolves(new Response(JSON.stringify(invalidRssJson)));
 
-            element.feedUrl = sampleFeedUrl;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(window.fetch.called);
@@ -261,7 +261,7 @@
 
             window.fetch.rejects({ message: errorMessage });
 
-            element.feedUrl = sampleFeedUrl;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(window.fetch.called);
@@ -290,7 +290,7 @@
             sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
             window.fetch.rejects({ message: errorMessage });
 
-            element.feedUrl = sampleFeedUrl;
+            element.feedurl = sampleFeedUrl;
 
             setTimeout(() => {
               assert.isTrue(window.fetch.called);
