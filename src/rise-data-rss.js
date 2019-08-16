@@ -17,14 +17,15 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
        */
       feedurl: {
         type: String,
-        observer: "_feedUrlChanged"
+        observer: "_feedurlChanged"
       },
       /**
        * The maximum number of items to return from the feed. The maximum allowed is 25.
        */
       maxitems: {
         type: Number,
-        value: 25
+        value: 25,
+        observer: "_maxitemsChanged"
       },
       /**
        * The latest successful response from the feed.
@@ -87,7 +88,11 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     return rssConfig.feedParserURL + "/" + this.feedurl;
   }
 
-  _feedUrlChanged() {
+  _feedurlChanged() {
+    this._loadFeedData();
+  }
+
+  _maxitemsChanged() {
     this._loadFeedData();
   }
 
