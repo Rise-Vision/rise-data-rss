@@ -15,14 +15,14 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       /**
        * The url of the feed that will be requested through feed-parser.
        */
-      feedUrl: {
+      feedurl: {
         type: String,
         observer: "_feedUrlChanged"
       },
       /**
        * The maximum number of items to return from the feed. The maximum allowed is 25.
        */
-      maxItems: {
+      maxitems: {
         type: Number,
         value: 25
       },
@@ -77,14 +77,14 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     if (this._initialStart) {
       this._initialStart = false;
 
-      if (this.feedUrl) {
+      if (this.feedurl) {
         this._loadFeedData();
       }
     }
   }
 
   _getUrl() {
-    return rssConfig.feedParserURL + "/" + this.feedUrl;
+    return rssConfig.feedParserURL + "/" + this.feedurl;
   }
 
   _feedUrlChanged() {
@@ -92,7 +92,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
   }
 
   _loadFeedData() {
-    if (!this._initialStart && this.feedUrl) {
+    if (!this._initialStart && this.feedurl) {
       super.fetch(this._getUrl(), {
         headers: { "X-Requested-With": "rise-data-rss" }
       });
@@ -107,7 +107,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
   _processRssData(data) {
     if (!data.Error) {
       if (!isEqual(this.feedData, data)) {
-        this._setFeedData(data.slice(0, this.maxItems));
+        this._setFeedData(data.slice(0, this.maxitems));
 
         this.log( "info", "data provided" );
 
