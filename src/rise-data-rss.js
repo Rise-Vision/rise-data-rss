@@ -111,8 +111,10 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
   _processRssData(data) {
     if (!data.Error) {
-      if (!isEqual(this.feedData, data)) {
-        this._setFeedData(data.slice(0, this.maxitems));
+      let slicedData = data.slice(0, this.maxitems);
+
+      if (!isEqual(this.feedData, slicedData)) {
+        this._setFeedData(slicedData);
 
         this.log( "info", "data provided" );
 

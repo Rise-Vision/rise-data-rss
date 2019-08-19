@@ -138,6 +138,48 @@
           });
         });
 
+        suite("_processRssData", () => {
+          setup(() => {
+            sandbox.stub(element, "_loadFeedData");
+            sandbox.stub(element, "_sendRssEvent");
+          });
+
+          test("should set feedData", () => {
+            element._processRssData([{ title: "Title 1" }]);
+
+            assert.equal(element.feedData.length, 1);
+            assert.isTrue(element._sendRssEvent.calledOnce);
+          });
+
+          test("should set feedData again if data changed", () => {
+            element._processRssData([{ title: "Title 1" }]);
+            element._processRssData([{ title: "Title 2" }]);
+
+            assert.equal(element.feedData.length, 1);
+            assert.isTrue(element._sendRssEvent.calledTwice);
+          });
+
+          test("should set feedData again if max items has changed", () => {
+            var data = [{ title: "Title 1" }, { title: "Title 2" }, { title: "Title 3" }];
+
+            element.maxitems = 3;
+            element._processRssData(data);
+            element.maxitems = 2;
+            element._processRssData(data);
+
+            assert.equal(element.feedData.length, 2);
+            assert.isTrue(element._sendRssEvent.calledTwice);
+          });
+
+          test("should not set feedData again if data has not changed", () => {
+            element._processRssData([{ title: "Title 1" }]);
+            element._processRssData([{ title: "Title 1" }]);
+
+            assert.equal(element.feedData.length, 1);
+            assert.isTrue(element._sendRssEvent.calledOnce);
+          });
+        });
+
         suite("_loadFeedData", () => {
           let response;
 
