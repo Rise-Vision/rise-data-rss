@@ -61,6 +61,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
     this._setVersion(version);
     this._initialStart = true;
+    this._latestFailed = false;
   }
 
   ready() {
@@ -115,7 +116,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     if (!data.Error) {
       let slicedData = data.slice(0, this.maxitems);
 
-      if (!isEqual(this.feedData, slicedData)) {
+      if (!isEqual(this.feedData, slicedData) || this._latestFailed) {
+        this._latestFailed = false;
         this._setFeedData(slicedData);
 
         this.log( "info", "data provided" );
@@ -126,6 +128,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     else {
       let error = data.Error;
 
+      this._latestFailed = true;
       this.log( "error", "data error", { error });
 
       this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
