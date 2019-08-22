@@ -178,6 +178,24 @@
             assert.equal(element.feedData.length, 1);
             assert.isTrue(element._sendRssEvent.calledOnce);
           });
+
+          test("should set feedData again if an error happened before the second call, even if data has not changed", () => {
+            element._processRssData([{ title: "Title 1" }]);
+            element._latestFailed = true;
+            element._processRssData([{ title: "Title 1" }]);
+
+            assert.equal(element.feedData.length, 1);
+            assert.isTrue(element._sendRssEvent.calledTwice);
+            assert.isFalse(element._latestFailed);
+          });
+
+          test("should set _latestFailed to true if an error ocurred", () => {
+            element._processRssData({ Error: "An error ocurred" });
+
+            assert.isTrue(!element.feedData);
+            assert.isTrue(element._sendRssEvent.calledOnce);
+            assert.isTrue(element._latestFailed);
+          });
         });
 
         suite("_loadFeedData", () => {
