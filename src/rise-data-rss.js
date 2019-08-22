@@ -75,6 +75,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
     super.initCache({
       name: this.tagName.toLowerCase(),
+      duration: 1000 * 60 * 5,
       expiry: -1
     });    
   }
