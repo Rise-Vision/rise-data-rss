@@ -1,4 +1,3 @@
-const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 const PREFERRED_FORMATS = [ "jpeg", "jpg", "png" ];
 const ALT_FORMATS = [ "bmp", "gif" ];
 
@@ -21,13 +20,22 @@ export default class FeedFormatter {
   }
 
   _getDescription (feed) {
+    var description;
+
     if (feed["rss:description"] && feed["rss:description"]["#"]) {
-      return feed["rss:description"]["#"];
+      description = feed["rss:description"]["#"];
     } else if (feed.summary) {
-      return feed.summary;
+      description = feed.summary;
     } else {
-      return feed.description;
+      description = feed.description;
     }
+
+    if (description) {
+      description = this._removeElements(description, "img");
+      description = this._removeElements(description, "a");
+    }
+
+    return description;
   }
 
   _getLink (feed) {
@@ -36,14 +44,18 @@ export default class FeedFormatter {
 
   _getImageUrl (feed) {
     let foundImages = [];
+    let _appendFoundImages = (html) => {
+      this._extractImages(html).forEach(image => {
+        foundImages.push(image);
+      });
+    }
+
+    if (feed.description) {
+      _appendFoundImages(feed.description);
+    }
 
     if (feed["content:encoded"] && feed["content:encoded"]["#"]) {
-      let rgx = new RegExp("src='(" + URL_REGEX.source + ")'");
-      let res = feed["content:encoded"]["#"].match(rgx);
-
-      if (res.length > 1 && res[1]) {
-        foundImages.push(res[1]);
-      }
+      _appendFoundImages(feed["content:encoded"]["#"]);
     }
 
     if (feed["rss:image"] && feed["rss:image"]["#"]) {
@@ -91,5 +103,42 @@ export default class FeedFormatter {
 
   _isAltFormat (imageUrl) {
     return this._isValidImage(imageUrl, ALT_FORMATS);
+  }
+
+  _extractImages (html) {
+    let content = this._parseHTML(html);
+    let imageTags = content.getElementsByTagName("img");
+    let extractedImages = [];
+
+    for (var i = 0; i < imageTags.length; i++) {
+      let image = imageTags[i];
+
+      if (image.src) {
+        extractedImages.push(image.src);
+      }
+    }
+
+    return extractedImages;
+  }
+
+  _removeElements (html, tag) {
+    let content = this._parseHTML(html);
+    let tags = content.getElementsByTagName(tag);
+
+    for (var i = tags.length - 1; i >= 0; i--) {
+      let tag = tags[i];
+
+      tag.parentElement.removeChild(tag);
+    }
+
+    return content.innerHTML;
+  }
+
+  _parseHTML (html) {
+    let div = document.createElement("div");
+
+    div.innerHTML = html;
+
+    return div;
   }
 }

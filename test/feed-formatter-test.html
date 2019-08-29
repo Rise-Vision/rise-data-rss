@@ -119,6 +119,32 @@
             assert.equal(formatter._getBestImage(["image.pdf"]), null);
           });
         });
+
+        suite("_extractImages", () => {
+          test("should extract image urls from provided HTML", () => {
+            let html = "<img src='https://media.npr.org/image1.jpg' alt='Poorly formatted source's alt text'/><p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p><img src='https://media.npr.org/image2.png' />";
+            let images = ["https://media.npr.org/image1.jpg", "https://media.npr.org/image2.png"];
+
+            assert.deepEqual(formatter._extractImages(html), images);
+          });
+        });
+
+        suite("_removeElements", () => {
+          test("should remove the images from the provided HTML", () => {
+            let html = "<img src='https://media.npr.org/image1.jpg' alt='Poorly formatted source's alt text'/><p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p><img src='https://media.npr.org/image2.png' />";
+            let html2 = "<p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p>";
+
+            assert.deepEqual(formatter._removeElements(html, "img"), html2);
+          });
+
+          test("should remove the images and links from the provided HTML", () => {
+            let html = "<img src=\"https://i.kinja-img.com/image1.jpg\" /><p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>";
+            let html2 = "<p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p></p>";
+            let htmlWithoutImages = formatter._removeElements(html, "img");
+
+            assert.deepEqual(formatter._removeElements(htmlWithoutImages, "a"), html2);
+          });
+        });
       });
 
       let nprSample = {
