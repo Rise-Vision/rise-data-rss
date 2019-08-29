@@ -32,7 +32,6 @@ export default class FeedFormatter {
 
     if (description) {
       description = this._removeElements(description, "img");
-      description = this._removeElements(description, "a");
     }
 
     return description;
