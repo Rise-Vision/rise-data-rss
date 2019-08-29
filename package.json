@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
+    "eslint-utils": ">=1.4.1",
     "@polymer/test-fixture": "^4.0.2",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",

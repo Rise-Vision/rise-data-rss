@@ -56,7 +56,7 @@ The **data-update** event provides an object with the following fields:
 - **link**: Link to the feed's originating post.
 - **imageUrl**: The image associated to the post. The component looks for images in several places and provides the first valid image it finds, prioritizing what it finds in determined fields.
 - **author**: Author of the post.
-- **pubDate**: Publication date
+- **pubDate**: Publication date.
 
 ### Logging
 
