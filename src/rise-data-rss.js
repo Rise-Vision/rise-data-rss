@@ -4,6 +4,7 @@ import { FetchMixin } from "rise-common-component/src/fetch-mixin.js";
 
 import { rssConfig } from "./rise-data-rss-config.js";
 import { version } from "./rise-data-rss-version.js";
+import FeedFormatter from "./feed-formatter.js";
 import isEqual from "lodash-es/isEqual";
 
 const fetchBase = CacheMixin( RiseElement );
@@ -62,6 +63,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     this._setVersion(version);
     this._initialStart = true;
     this._latestFailed = false;
+    this._feedFormatter = new FeedFormatter();
   }
 
   ready() {
@@ -123,7 +125,9 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
         this.log( "info", "data provided" );
 
-        this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData);
+        this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData.map( item => {
+          return this._feedFormatter.formatFeed(item);
+        }));
       }
     }
     else {

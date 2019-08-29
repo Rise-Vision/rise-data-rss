@@ -1,6 +1,6 @@
 {
   "name": "rise-data-rss",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Rise Data Rss",
   "scripts": {
     "prebuild": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh prod rise-data-rss",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
+    "eslint-utils": ">=1.4.1",
     "@polymer/test-fixture": "^4.0.2",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
