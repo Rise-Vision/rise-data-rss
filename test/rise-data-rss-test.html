@@ -38,9 +38,16 @@
             title: "Title 1",
             description: "Description 1",
             image: {
-              url: "http://www.feedforall.com/ffalogo48x48.gif",
+              url: "http://www.feedforall.com/ffalogo48x48.png",
               title: "FeedForAll Sample Feed"
             }
+          }
+        ];
+        const formattedRssJson = [
+          {
+            title: "Title 1",
+            description: "Description 1",
+            imageUrl: "http://www.feedforall.com/ffalogo48x48.png",
           }
         ];
         const invalidRssJson = {
@@ -221,7 +228,7 @@
               assert.deepEqual(element.log.getCall(1).args[2], { cached: true });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(element._sendEvent.getCall(0).args[1], validRssJson);
+              assert.deepEqual(JSON.stringify(element._sendEvent.getCall(0).args[1]), JSON.stringify(formattedRssJson));
 
               done();
             }, 30);
@@ -229,6 +236,9 @@
 
           test("should handle a valid response from feed-parser", done => {
             sandbox.stub(cacheMixin, "getCache").rejects();
+            // Do not format feed
+            sandbox.stub(element._feedFormatter, "formatFeed").callsFake(function (val) { return val; });
+
             window.fetch.resolves(new Response(JSON.stringify(validRssJson)));
 
             element.feedurl = sampleFeedUrl;
@@ -260,6 +270,9 @@
             });
 
             sandbox.stub(cacheMixin, "getCache").rejects();
+            // Do not format feed
+            sandbox.stub(element._feedFormatter, "formatFeed").callsFake(function (val) { return val; });
+
             window.fetch.resolves(new Response(JSON.stringify(largeRssJson)));
 
             element.maxitems = 15;
