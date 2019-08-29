@@ -47,6 +47,17 @@ The component listens for the following events:
 
 - **start**: This event will make an initial fetch for the RSS feed and then periodically fetch the RSS feed (refresh will be disabled in Preview). It can be dispatched to the component when the _configured_ event has been fired.
 
+### Provided data
+
+The **data-update** event provides an object with the following fields:
+
+- **title**: Title of the feed.
+- **description**: Description of the feed. Any `img` tag embedded in the feed will be removed before generating the event.
+- **link**: Link to the feed's originating post.
+- **imageUrl**: The image associated to the post. The component looks for images in several places and provides the first valid image it finds, prioritizing what it finds in determined fields.
+- **author**: Author of the post.
+- **pubDate**: Publication date
+
 ### Logging
 
 The component logs the following events to BQ:
