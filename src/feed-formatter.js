@@ -1,5 +1,6 @@
-//const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/;
 const URL_REGEX = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+const PREFERRED_FORMATS = [ "jpeg", "jpg", "png" ];
+const ALT_FORMATS = [ "bmp", "gif" ];
 
 export default class FeedFormatter {
   formatFeed (feed) {
@@ -61,7 +62,7 @@ export default class FeedFormatter {
       foundImages.push(feed.image.url);
     }
 
-    return foundImages.find(this._isValidImage);
+    return this._getBestImage(foundImages);
   }
 
   _getAuthor (feed) {
@@ -72,12 +73,23 @@ export default class FeedFormatter {
     return feed.pubdate || feed.pubDate;
   }
 
-  _isValidImage (imageUrl) {
-    let validFormats = [ "bmp", "jpeg", "jpg", "png" ];
+  _isValidImage (imageUrl, validFormats) {
     let url = imageUrl.toLowerCase();
 
     return !!validFormats.find( ext => {
       return url.endsWith("." + ext) || url.indexOf("." + ext + "?") >= 0;
     });
+  }
+
+  _getBestImage (foundImages) {
+    return foundImages.find(this._isPreferredFormat.bind(this)) || foundImages.find(this._isAltFormat.bind(this));
+  }
+
+  _isPreferredFormat (imageUrl) {
+    return this._isValidImage(imageUrl, PREFERRED_FORMATS);
+  }
+
+  _isAltFormat (imageUrl) {
+    return this._isValidImage(imageUrl, ALT_FORMATS);
   }
 }

@@ -89,17 +89,34 @@
           });
         });
 
-        suite("_isValidImage", () => {
-          test("should return true for valid images", () => {
-            assert.isTrue(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg"));
-            assert.isTrue(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.png"));
-            assert.isTrue(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg?test=1"));
+        suite("_isPreferredFormat", () => {
+          test("should return true for preferred formats", () => {
+            assert.isTrue(formatter._isPreferredFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg"));
+            assert.isTrue(formatter._isPreferredFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.png"));
+            assert.isTrue(formatter._isPreferredFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg?test=1"));
           });
 
-          test("should return false for non valid images", () => {
-            assert.isFalse(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.gif"));
-            assert.isFalse(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.pdf"));
-            assert.isFalse(formatter._isValidImage("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.gif?test=1"));
+          test("should return true for alt formats", () => {
+            assert.isTrue(formatter._isAltFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.gif"));
+            assert.isTrue(formatter._isAltFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.bmp?test=1"));
+          });
+
+          test("should return false for invalid images", () => {
+            assert.isFalse(formatter._isPreferredFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.gif"));
+            assert.isFalse(formatter._isPreferredFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.gif?test=1"));
+            assert.isFalse(formatter._isAltFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg"));
+            assert.isFalse(formatter._isAltFormat("https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg?test=1"));
+          });
+        });
+
+        suite("_getBestImage", () => {
+          test("should return true for valid images", () => {
+            assert.equal(formatter._getBestImage([]), null);
+            assert.equal(formatter._getBestImage(["image.jpg"]), "image.jpg");
+            assert.equal(formatter._getBestImage(["image.jpg", "image.gif"]), "image.jpg");
+            assert.equal(formatter._getBestImage(["image.gif", "image.jpg"]), "image.jpg");
+            assert.equal(formatter._getBestImage(["image.gif", "image.pdf"]), "image.gif");
+            assert.equal(formatter._getBestImage(["image.pdf"]), null);
           });
         });
       });
