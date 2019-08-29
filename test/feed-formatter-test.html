@@ -41,6 +41,7 @@
             assert.equal(formatter.formatFeed(nprSample).title, "In Book, Former Defense Chief Mattis Sideswipes President Trump's Leadership Skills");
             assert.equal(formatter.formatFeed(wiredSample).title, "Fitbit Premium, Versa 2, Aria Air: Pricing, Specs, Details");
             assert.equal(formatter.formatFeed(espnSample).title, "Kobe: 'Nothin but love' for Shaq after drama");
+            assert.equal(formatter.formatFeed(onionSample).title, "‘Yeah, I Totally Wore These On The Moon,’ Says Buzz Aldrin Selling Old Pair Of Gym Socks To Complete Sucker For $500,000");
           });
         });
 
@@ -50,6 +51,7 @@
             assert.equal(formatter.formatFeed(nprSample).description, "In the general's upcoming leadership book,<em> Call Sign Chaos,</em> the Obama administration catches the most flak. Mattis barely mentions President Trump but implies criticism of the sitting president.");
             assert.equal(formatter.formatFeed(wiredSample).description, "The company’s new offerings include two fitness-tracking products, a subscription service for personalized health advice, and lots and lots of partnerships.");
             assert.equal(formatter.formatFeed(espnSample).description, "Kobe Bryant and Shaquille O'Neal, who won three titles together with the Lakers, were trending after a quote from Bryant on July 29 surfaced, saying he could have had \"12 rings\" if O'Neal spent more time in the gym.");
+            assert.equal(formatter.formatFeed(onionSample).description, "<p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p></p>");
           });
         });
 
@@ -59,6 +61,7 @@
             assert.equal(formatter.formatFeed(nprSample).link, "https://www.npr.org/2019/08/28/755018189/in-book-former-defense-chief-mattis-side-swipes-president-trump-s-leadership-ski?utm_medium=RSS&utm_campaign=news");
             assert.equal(formatter.formatFeed(wiredSample).link, "https://www.wired.com/story/fitbit-versa-2-aria-air-smart-scale-fitbit-premium");
             assert.equal(formatter.formatFeed(espnSample).link, "http://www.espn.com/nba/story/_/id/27485035/kobe-nothin-love-shaq-drama");
+            assert.equal(formatter.formatFeed(onionSample).link, "https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228");
           });
         });
 
@@ -68,6 +71,7 @@
             assert.equal(formatter.formatFeed(nprSample).imageUrl, "https://media.npr.org/assets/img/2019/08/28/gettyimages-1074493698_wide-d77a974046aaf94c8bd37c8083750e56ee67606a.jpg?s=600");
             assert.equal(formatter.formatFeed(wiredSample).imageUrl, "https://media.wired.com/photos/5d65a6d443e62000086148e5/master/pass/Gear-Fitbit_Versa_2-Lead.jpg");
             assert.equal(formatter.formatFeed(espnSample).imageUrl, "https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg");
+            assert.equal(formatter.formatFeed(onionSample).imageUrl, "https://i.kinja-img.com/gawker-media/image/upload/s--Mn-kHCtr--/c_fit,fl_progressive,q_80,w_636/creypf6zoo2lwciap0k6.jpg");
           });
         });
 
@@ -77,6 +81,7 @@
             assert.equal(formatter.formatFeed(nprSample).author, "David Welna");
             assert.equal(formatter.formatFeed(wiredSample).author, "Adrienne So");
             assert.equal(formatter.formatFeed(espnSample).author, null);
+            assert.equal(formatter.formatFeed(onionSample).author, "The Onion");
           });
         });
 
@@ -86,6 +91,7 @@
             assert.equal(formatter.formatFeed(nprSample).pubDate, "2019-08-28T17:52:00.000Z");
             assert.equal(formatter.formatFeed(wiredSample).pubDate, "2019-08-28T13:00:00.000Z");
             assert.equal(formatter.formatFeed(espnSample).pubDate, "2019-08-28T19:27:14.000Z");
+            assert.equal(formatter.formatFeed(onionSample).pubDate, "2019-08-29T15:00:00.000Z");
           });
         });
 
@@ -257,6 +263,48 @@
         "rss:pubdate": {
           "@": {},
           "#": "Wed, 28 Aug 2019 14:27:14 EST"
+        }
+      };
+
+      let onionSample = {
+        "title": "‘Yeah, I Totally Wore These On The Moon,’ Says Buzz Aldrin Selling Old Pair Of Gym Socks To Complete Sucker For $500,000",
+        "description": "<img src=\"https://i.kinja-img.com/gawker-media/image/upload/s--Mn-kHCtr--/c_fit,fl_progressive,q_80,w_636/creypf6zoo2lwciap0k6.jpg\" /><p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>",
+        "summary": "<img src=\"https://i.kinja-img.com/gawker-media/image/upload/s--Mn-kHCtr--/c_fit,fl_progressive,q_80,w_636/creypf6zoo2lwciap0k6.jpg\" /><p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>",
+        "date": "2019-08-29T15:00:00.000Z",
+        "pubdate": "2019-08-29T15:00:00.000Z",
+        "pubDate": "2019-08-29T15:00:00.000Z",
+        "link": "https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228",
+        "author": "The Onion",
+        "comments": null,
+        "origlink": null,
+        "image": {},
+        "enclosures": [],
+        "rss:@": {},
+        "rss:title": {
+          "@": {},
+          "#": "‘Yeah, I Totally Wore These On The Moon,’ Says Buzz Aldrin Selling Old Pair Of Gym Socks To Complete Sucker For $500,000"
+        },
+        "rss:link": {
+          "@": {},
+          "#": "https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228"
+        },
+        "rss:description": {
+          "@": {},
+          "#": "<img src=\"https://i.kinja-img.com/gawker-media/image/upload/s--Mn-kHCtr--/c_fit,fl_progressive,q_80,w_636/creypf6zoo2lwciap0k6.jpg\" /><p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>"
+        },
+        "rss:pubdate": {
+          "@": {},
+          "#": "Thu, 29 Aug 2019 15:00:00 GMT"
+        },
+        "rss:guid": {
+          "@": {
+            "ispermalink": "false"
+          },
+          "#": "1837705228"
+        },
+        "dc:creator": {
+          "@": {},
+          "#": "The Onion"
         }
       };
     </script>
