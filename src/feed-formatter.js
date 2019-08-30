@@ -32,6 +32,7 @@ export default class FeedFormatter {
 
     if (description) {
       description = this._removeElements(description, "img");
+      description = this._removeAttributes(description, "style");
     }
 
     return description;
@@ -128,6 +129,19 @@ export default class FeedFormatter {
       let tag = tags[i];
 
       tag.parentElement.removeChild(tag);
+    }
+
+    return content.innerHTML;
+  }
+
+  _removeAttributes (html, attributeName) {
+    let content = this._parseHTML(html);
+    let elements = content.querySelectorAll(":not([" + attributeName + "=''])");
+
+    for (var i = 0; i < elements.length; i++) {
+      var element = elements[i];
+
+      element.removeAttribute(attributeName);
     }
 
     return content.innerHTML;
