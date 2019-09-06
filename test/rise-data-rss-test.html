@@ -329,7 +329,7 @@
             let errorMessage = "Failed to connect to feed-parser";
 
             sandbox.stub(cacheMixin, "getCache").rejects();
-            sandbox.stub(fetchMixin, "_isOffline").resolves(false);
+            sandbox.stub(riseElement, "isOffline").resolves(false);
             sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
 
             window.fetch.rejects({ message: errorMessage });
@@ -359,7 +359,7 @@
 
             sandbox.stub(element, "_handleResponse");
             sandbox.stub(cacheMixin, "getCache").rejects();
-            sandbox.stub(fetchMixin, "_isOffline").resolves(true);
+            sandbox.stub(riseElement, "isOffline").resolves(true);
             sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
             window.fetch.rejects({ message: errorMessage });
 
