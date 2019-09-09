@@ -132,16 +132,16 @@
           });
         });
 
-        suite("fixImage", () => {
+        suite("_fixImageUrl", () => {
           test("should return the provided image if fixes are not required", () => {
-            assert.equal(formatter._fixImage("image.jpg"), "image.jpg");
+            assert.equal(formatter._fixImageUrl("image.jpg"), "image.jpg");
           });
 
           test("should remove Yahoo's minifier", () => {
             let fullPath = "http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163";
             let extracted = "https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163";
 
-            assert.equal(formatter._fixImage(fullPath), extracted);
+            assert.equal(formatter._fixImageUrl(fullPath), extracted);
           });
         });
 

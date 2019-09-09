@@ -97,10 +97,10 @@ export default class FeedFormatter {
   _getBestImage (foundImages) {
     let bestImage = foundImages.find(this._isPreferredFormat.bind(this)) || foundImages.find(this._isAltFormat.bind(this)) || foundImages.find(this._isUndefinedFormat.bind(this));
 
-    return bestImage && this._fixImage(bestImage);
+    return bestImage && this._fixImageUrl(bestImage);
   }
 
-  _fixImage (imageUrl) {
+  _fixImageUrl (imageUrl) {
     let lastHttps = imageUrl.lastIndexOf("https://");
     let yahooPathIdx = imageUrl.indexOf("yimg.com");
 
@@ -149,10 +149,10 @@ export default class FeedFormatter {
       let foundTags = content.getElementsByTagName(tag);
 
       for (var i = foundTags.length - 1; i >= 0; i--) {
-        let tag = foundTags[i];
+        let elem = foundTags[i];
 
-        if (!onlyEmpty || this._isEmptyTag(tag)) {
-          tag.parentElement.removeChild(tag);
+        if (!onlyEmpty || this._isEmptyTag(elem)) {
+          elem.parentElement.removeChild(elem);
         }
       }
     });
