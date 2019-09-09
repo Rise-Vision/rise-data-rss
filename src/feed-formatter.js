@@ -31,8 +31,9 @@ export default class FeedFormatter {
     }
 
     if (description) {
-      description = this._removeElements(description, "img");
-      description = this._removeAttributes(description, "style");
+      description = this._removeElements(description, ["img"]);
+      description = this._removeEmptyElements(description, ["a", "p"]);
+      description = this._removeAttributes(description, ["style"]);
     }
 
     return description;
@@ -94,7 +95,20 @@ export default class FeedFormatter {
   }
 
   _getBestImage (foundImages) {
-    return foundImages.find(this._isPreferredFormat.bind(this)) || foundImages.find(this._isAltFormat.bind(this));
+    let bestImage = foundImages.find(this._isPreferredFormat.bind(this)) || foundImages.find(this._isAltFormat.bind(this)) || foundImages.find(this._isUndefinedFormat.bind(this));
+
+    return bestImage && this._fixImage(bestImage);
+  }
+
+  _fixImage (imageUrl) {
+    let lastHttps = imageUrl.lastIndexOf("https://");
+    let yahooPathIdx = imageUrl.indexOf("yimg.com");
+
+    if (yahooPathIdx >= 0 && lastHttps > yahooPathIdx) {
+      return imageUrl.substr(lastHttps);
+    }
+
+    return imageUrl;
   }
 
   _isPreferredFormat (imageUrl) {
@@ -103,6 +117,13 @@ export default class FeedFormatter {
 
   _isAltFormat (imageUrl) {
     return this._isValidImage(imageUrl, ALT_FORMATS);
+  }
+
+  _isUndefinedFormat (imageUrl) {
+    var parts = imageUrl.split("/");
+    var fileName = parts.length > 0 ? parts[parts.length - 1] : "";
+
+    return fileName.indexOf(".") === -1;
   }
 
   _extractImages (html) {
@@ -121,28 +142,44 @@ export default class FeedFormatter {
     return extractedImages;
   }
 
-  _removeElements (html, tag) {
+  _removeElements (html, tags, onlyEmpty) {
     let content = this._parseHTML(html);
-    let tags = content.getElementsByTagName(tag);
 
-    for (var i = tags.length - 1; i >= 0; i--) {
-      let tag = tags[i];
+    tags.forEach(tag => {
+      let foundTags = content.getElementsByTagName(tag);
 
-      tag.parentElement.removeChild(tag);
-    }
+      for (var i = foundTags.length - 1; i >= 0; i--) {
+        let tag = foundTags[i];
+
+        if (!onlyEmpty || this._isEmptyTag(tag)) {
+          tag.parentElement.removeChild(tag);
+        }
+      }
+    });
 
     return content.innerHTML;
   }
 
-  _removeAttributes (html, attributeName) {
+  _isEmptyTag (tag) {
+    return !tag.firstChild && tag.innerText.trim() === "";
+  }
+
+  _removeEmptyElements (html, tags) {
+    return this._removeElements(html, tags, true);
+  }
+
+  _removeAttributes (html, attributeNames) {
     let content = this._parseHTML(html);
-    let elements = content.querySelectorAll(":not([" + attributeName + "=''])");
 
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
+    attributeNames.forEach(attributeName => {
+      let elements = content.querySelectorAll(":not([" + attributeName + "=''])");
 
-      element.removeAttribute(attributeName);
-    }
+      for (var i = 0; i < elements.length; i++) {
+        var element = elements[i];
+
+        element.removeAttribute(attributeName);
+      }
+    });
 
     return content.innerHTML;
   }

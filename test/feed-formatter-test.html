@@ -42,6 +42,7 @@
             assert.equal(formatter.formatFeed(wiredSample).title, "Fitbit Premium, Versa 2, Aria Air: Pricing, Specs, Details");
             assert.equal(formatter.formatFeed(espnSample).title, "Kobe: 'Nothin but love' for Shaq after drama");
             assert.equal(formatter.formatFeed(onionSample).title, "‘Yeah, I Totally Wore These On The Moon,’ Says Buzz Aldrin Selling Old Pair Of Gym Socks To Complete Sucker For $500,000");
+            assert.equal(formatter.formatFeed(yahooSample).title, "Trump shares bizarre cat meme about his altered hurricane map");
           });
         });
 
@@ -52,6 +53,7 @@
             assert.equal(formatter.formatFeed(wiredSample).description, "The company’s new offerings include two fitness-tracking products, a subscription service for personalized health advice, and lots and lots of partnerships.");
             assert.equal(formatter.formatFeed(espnSample).description, "<p>Kobe Bryant and Shaquille O'Neal</p>, who won three titles together with the Lakers, were trending after a quote from Bryant on July 29 surfaced, saying he could have had \"12 rings\" if O'Neal spent more time in the gym.");
             assert.equal(formatter.formatFeed(onionSample).description, "<p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>");
+            assert.equal(formatter.formatFeed(yahooSample).description, "<p>President Trump prolonged a weeklong controversy over Hurricane Dorian, sharing cat video late Saturday night that mocked coverage of his incorrect claims about the storm’s path.</p><p><br clear=\"all\"></p>")
           });
         });
 
@@ -62,6 +64,7 @@
             assert.equal(formatter.formatFeed(wiredSample).link, "https://www.wired.com/story/fitbit-versa-2-aria-air-smart-scale-fitbit-premium");
             assert.equal(formatter.formatFeed(espnSample).link, "http://www.espn.com/nba/story/_/id/27485035/kobe-nothin-love-shaq-drama");
             assert.equal(formatter.formatFeed(onionSample).link, "https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228");
+            assert.equal(formatter.formatFeed(yahooSample).link, "https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html");
           });
         });
 
@@ -72,6 +75,7 @@
             assert.equal(formatter.formatFeed(wiredSample).imageUrl, "https://media.wired.com/photos/5d65a6d443e62000086148e5/master/pass/Gear-Fitbit_Versa_2-Lead.jpg");
             assert.equal(formatter.formatFeed(espnSample).imageUrl, "https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg");
             assert.equal(formatter.formatFeed(onionSample).imageUrl, "https://i.kinja-img.com/gawker-media/image/upload/s--Mn-kHCtr--/c_fit,fl_progressive,q_80,w_636/creypf6zoo2lwciap0k6.jpg");
+            assert.equal(formatter.formatFeed(yahooSample).imageUrl, "https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163");
           });
         });
 
@@ -82,6 +86,7 @@
             assert.equal(formatter.formatFeed(wiredSample).author, "Adrienne So");
             assert.equal(formatter.formatFeed(espnSample).author, null);
             assert.equal(formatter.formatFeed(onionSample).author, "The Onion");
+            assert.equal(formatter.formatFeed(yahooSample).author, null);
           });
         });
 
@@ -92,6 +97,7 @@
             assert.equal(formatter.formatFeed(wiredSample).pubDate, "2019-08-28T13:00:00.000Z");
             assert.equal(formatter.formatFeed(espnSample).pubDate, "2019-08-28T19:27:14.000Z");
             assert.equal(formatter.formatFeed(onionSample).pubDate, "2019-08-29T15:00:00.000Z");
+            assert.equal(formatter.formatFeed(yahooSample).pubDate, "2019-09-08T20:40:31.000Z");
           });
         });
 
@@ -126,6 +132,19 @@
           });
         });
 
+        suite("fixImage", () => {
+          test("should return the provided image if fixes are not required", () => {
+            assert.equal(formatter._fixImage("image.jpg"), "image.jpg");
+          });
+
+          test("should remove Yahoo's minifier", () => {
+            let fullPath = "http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163";
+            let extracted = "https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163";
+
+            assert.equal(formatter._fixImage(fullPath), extracted);
+          });
+        });
+
         suite("_extractImages", () => {
           test("should extract image urls from provided HTML", () => {
             let html = "<img src='https://media.npr.org/image1.jpg' alt='Poorly formatted source's alt text'/><p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p><img src='https://media.npr.org/image2.png' />";
@@ -140,15 +159,22 @@
             let html = "<img src='https://media.npr.org/image1.jpg' alt='Poorly formatted source's alt text'/><p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p><img src='https://media.npr.org/image2.png' />";
             let html2 = "<p>Paragraph 1</p><p>(Image credit: Bloomberg via Getty Images)</p>";
 
-            assert.deepEqual(formatter._removeElements(html, "img"), html2);
+            assert.deepEqual(formatter._removeElements(html, ["img"]), html2);
           });
 
           test("should remove the images and links from the provided HTML", () => {
             let html = "<img src=\"https://i.kinja-img.com/image1.jpg\" /><p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p><a href=\"https://www.theonion.com/yeah-i-totally-wore-these-on-the-moon-says-buzz-ald-1837705228\">Read more...</a></p>";
             let html2 = "<p>BREVARD COUNTY, FL—Trying to hold back laughter while explaining how the garments were knit out of “proprietary NASA materials that are specially optimized for zero gravity,” Buzz Aldrin was reportedly selling a pair of old gym socks for $500,000 to a complete sucker Thursday, assuring him that he “totally” wore them…</p><p></p>";
-            let htmlWithoutImages = formatter._removeElements(html, "img");
+            let htmlWithoutImages = formatter._removeElements(html, ["img"]);
 
-            assert.deepEqual(formatter._removeElements(htmlWithoutImages, "a"), html2);
+            assert.deepEqual(formatter._removeElements(htmlWithoutImages, ["a"]), html2);
+          });
+
+          test("should remove empty p and a tags (after images were removed)", () => {
+            let html = "<p>This is text</p><a><img src='https://media.npr.org/image1.jpg' alt='Poorly formatted source's alt text'/></a><p></p>";
+            let htmlWithoutImages = formatter._removeElements(html, ["img"]);
+
+            assert.deepEqual(formatter._removeEmptyElements(htmlWithoutImages, ["a", "p"]), "<p>This is text</p>");
           });
         });
       });
@@ -305,6 +331,81 @@
         "dc:creator": {
           "@": {},
           "#": "The Onion"
+        }
+      };
+
+      let yahooSample = {
+        "title": "Trump shares bizarre cat meme about his altered hurricane map",
+        "description": "<p><a href=\"https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html\"><img src=\"http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163\" width=\"130\" height=\"86\" alt=\"Trump shares bizarre cat meme about his altered hurricane map\" align=\"left\" title=\"Trump shares bizarre cat meme about his altered hurricane map\" border=\"0\" ></a>President Trump prolonged a weeklong controversy over Hurricane Dorian, sharing cat video late Saturday night that mocked coverage of his incorrect claims about the storm’s path.<p><br clear=\"all\">",
+        "summary": "<p><a href=\"https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html\"><img src=\"http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163\" width=\"130\" height=\"86\" alt=\"Trump shares bizarre cat meme about his altered hurricane map\" align=\"left\" title=\"Trump shares bizarre cat meme about his altered hurricane map\" border=\"0\" ></a>President Trump prolonged a weeklong controversy over Hurricane Dorian, sharing cat video late Saturday night that mocked coverage of his incorrect claims about the storm’s path.<p><br clear=\"all\">",
+        "date": "2019-09-08T20:40:31.000Z",
+        "pubdate": "2019-09-08T20:40:31.000Z",
+        "pubDate": "2019-09-08T20:40:31.000Z",
+        "link": "https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html",
+        "guid": "trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html",
+        "author": null,
+        "comments": null,
+        "origlink": null,
+        "image": {},
+        "source": {
+          "title": "Yahoo News",
+          "url": "https://www.yahoo.com/news/"
+        },
+        "enclosures": [
+          {
+            "url": "http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163",
+            "type": null,
+            "length": null,
+            "height": "86",
+            "width": "130"
+          }
+        ],
+        "rss:@": {},
+        "rss:title": {
+          "@": {},
+          "#": "Trump shares bizarre cat meme about his altered hurricane map"
+        },
+        "rss:description": {
+          "@": {},
+          "#": "<p><a href=\"https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html\"><img src=\"http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163\" width=\"130\" height=\"86\" alt=\"Trump shares bizarre cat meme about his altered hurricane map\" align=\"left\" title=\"Trump shares bizarre cat meme about his altered hurricane map\" border=\"0\" ></a>President Trump prolonged a weeklong controversy over Hurricane Dorian, sharing cat video late Saturday night that mocked coverage of his incorrect claims about the storm’s path.<p><br clear=\"all\">"
+        },
+        "rss:link": {
+          "@": {},
+          "#": "https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html"
+        },
+        "rss:pubdate": {
+          "@": {},
+          "#": "Sun, 08 Sep 2019 16:40:31 -0400"
+        },
+        "rss:source": {
+          "@": {
+            "url": "https://www.yahoo.com/news/"
+          },
+          "#": "Yahoo News"
+        },
+        "rss:guid": {
+          "@": {
+            "ispermalink": "false"
+          },
+          "#": "trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html"
+        },
+        "media:content": {
+          "@": {
+            "height": "86",
+            "url": "http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163",
+            "width": "130"
+          }
+        },
+        "media:text": {
+          "@": {
+            "type": "html"
+          },
+          "#": "<p><a href=\"https://news.yahoo.com/trump-shares-bizarre-cat-meme-about-his-altered-hurricane-map-204031017.html\"><img src=\"http://l1.yimg.com/uu/api/res/1.2/7P1Mj1R4_fcgTVuf4PwAaQ--/YXBwaWQ9eXRhY2h5b247aD04Njt3PTEzMDs-/https://media-mbst-pub-ue1.s3.amazonaws.com/creatr-uploaded-images/2019-09/89086cd0-d278-11e9-b7d5-94f3df1ad163\" width=\"130\" height=\"86\" alt=\"Trump shares bizarre cat meme about his altered hurricane map\" align=\"left\" title=\"Trump shares bizarre cat meme about his altered hurricane map\" border=\"0\" ></a>President Trump prolonged a weeklong controversy over Hurricane Dorian, sharing cat video late Saturday night that mocked coverage of his incorrect claims about the storm’s path.<p><br clear=\"all\">"
+        },
+        "media:credit": {
+          "@": {
+            "role": "publishing company"
+          }
         }
       };
     </script>
