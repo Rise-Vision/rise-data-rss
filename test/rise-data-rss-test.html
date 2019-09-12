@@ -315,7 +315,10 @@
                 assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
                 // Should log the error data
                 assert.equal(element.log.getCall(2).args[1], "data error");
-                assert.deepEqual(element.log.getCall(2).args[2], { error: invalidRssJson.Error });
+                assert.deepEqual(element.log.getCall(2).args[2], {
+                  feed: "https://www.feedforall.com/sample.xml",
+                  error: invalidRssJson.Error
+                });
                 // Should send a data-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "data-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: invalidRssJson.Error });
