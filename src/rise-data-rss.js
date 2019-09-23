@@ -111,10 +111,12 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
   _handleResponse(response) {
     response.json()
-      .then(this._processRssData.bind(this));
+      .then( json => {
+        this._processRssData(json, response.isOffline);
+      });
   }
 
-  _processRssData(data) {
+  _processRssData(data, isOffline) {
     if (!data.Error) {
       let slicedData = data.slice(0, this.maxitems);
 
@@ -125,7 +127,13 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
         this.log( "info", "data provided" );
 
         this._sendRssEvent(RiseDataRss.EVENT_DATA_UPDATE, this.feedData.map( item => {
-          return this._feedFormatter.formatFeed(item);
+          let formattedFeed = this._feedFormatter.formatFeed(item);
+
+          if (isOffline) {
+            formattedFeed.imageUrl = null;
+          }
+
+          return formattedFeed;
         }));
       }
     }
