@@ -203,6 +203,18 @@
             assert.isTrue(element._sendRssEvent.calledOnce);
             assert.isTrue(element._latestFailed);
           });
+
+          test("should provide imageUrl if online", () => {
+            element._processRssData([{ title: "Title 1", image: { url: "imageUrl" } }]);
+
+            assert.equal(JSON.stringify(element._sendRssEvent.getCall(0).args[1]), JSON.stringify([{ title: "Title 1", imageUrl: "imageUrl" }]));
+          });
+
+          test("should not provide imageUrl if offline", () => {
+            element._processRssData([{ title: "Title 1", image: { url: "imageUrl" } }], true);
+
+            assert.equal(JSON.stringify(element._sendRssEvent.getCall(0).args[1]), JSON.stringify([{ title: "Title 1", imageUrl: null }]));
+          });
         });
 
         suite("_loadFeedData", () => {
@@ -228,7 +240,7 @@
               assert.deepEqual(element.log.getCall(1).args[2], { cached: true });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
-              assert.deepEqual(JSON.stringify(element._sendEvent.getCall(0).args[1]), JSON.stringify(formattedRssJson));
+              assert.equal(JSON.stringify(element._sendEvent.getCall(0).args[1]), JSON.stringify(formattedRssJson));
 
               done();
             }, 30);
