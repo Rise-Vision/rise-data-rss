@@ -354,7 +354,7 @@
               assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
 
               setTimeout(() => {
-                assert.isTrue(riseElement._setUptimeError.calledWith(true));
+                assert.isTrue(riseElement._setUptimeError.calledWith(false));
 
                 // Should log the received data
                 assert.equal(element.log.getCall(1).args[1], "data received");

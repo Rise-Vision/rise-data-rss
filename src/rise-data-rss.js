@@ -174,10 +174,10 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     switch (name) {
     case RiseDataRss.EVENT_REQUEST_ERROR:
     case RiseDataRss.EVENT_DATA_ERROR:
-    case RiseDataRss.EVENT_FEED_PROVIDER_ERROR:
       super._setUptimeError(true);
       break;
     case RiseDataRss.EVENT_DATA_UPDATE:
+    case RiseDataRss.EVENT_FEED_PROVIDER_ERROR:
       super._setUptimeError(false);
       break;
     default:
