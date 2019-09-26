@@ -53,6 +53,10 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     return "data-error";
   }
 
+  static get EVENT_FEED_PROVIDER_ERROR() {
+    return "feed-provider-error";
+  }
+
   static get EVENT_REQUEST_ERROR() {
     return "request-error";
   }
@@ -141,10 +145,19 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       let error = data.Error;
 
       this._latestFailed = true;
-      this.log( "error", "data error", { feed: this.feedurl, error });
 
-      this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
+      if (!this._isFeedProviderError(error)) {
+        this.log( "error", "data error", { feed: this.feedurl, error });
+        this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
+      } else {
+        this.log( "warning", "feed provider error", { feed: this.feedurl, error });
+        this._sendRssEvent(RiseDataRss.EVENT_FEED_PROVIDER_ERROR, { error });
+      }
     }
+  }
+
+  _isFeedProviderError(err) {
+    return !!err && ["etimedout", "econnreset", "parse error"].indexOf(err.trim().toLowerCase()) >= 0;
   }
 
   _handleError(err) {
@@ -161,6 +174,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     switch (name) {
     case RiseDataRss.EVENT_REQUEST_ERROR:
     case RiseDataRss.EVENT_DATA_ERROR:
+    case RiseDataRss.EVENT_FEED_PROVIDER_ERROR:
       super._setUptimeError(true);
       break;
     case RiseDataRss.EVENT_DATA_UPDATE:
