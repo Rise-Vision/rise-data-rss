@@ -40,7 +40,8 @@ The component sends the following events:
 
 - **configured**: The component has initialized what it requires to and is ready to handle a _start_ event.
 - **data-update**: An event proving a maximum of _max-items_ elements from the provided feed-url. This event will be generated on startup and whenever data on the feed has changed; if the feed has not changed since the last refresh, an event will not be generated. The data object is provided in `event.details`. The response format can be checked [here](https://www.npmjs.com/package/feedparser#what-is-the-parsed-output-produced-by-feedparser).
-- **data-error**: An event indicating the feed responded with an error (i.e. feed format, etc). An error object is provided in `event.details`.
+- **data-error**: An event indicating the feed responded with an error. An error object is provided in `event.details`.
+- **feed-provider-error**: An event indicating there were issues contacting the feed (establishing connection, timeout or bad data). An error object is provided in `event.details`.
 - **request-error**: An event indicating there were problems requesting the feed. An error object is provided in `event.details`.
 
 The component listens for the following events:
@@ -66,6 +67,7 @@ The component logs the following events to BQ:
 - **data received**: The component successfully retrieved data from the feed.
 - **data provided**: The component detected new data from the feed and provided it to the client.
 - **data error**: The component received an error from feed-parser. The details of the error will be provided as part of the log.
+- **feed provider error**: The component received an error from the feed. The details of the error will be provided as part of the log.
 - **request error**: The component was not able to connect to feed-parser.
 - **client offline**: The component was not able to connect to feed-parser because the client has connectivity issues.
 
