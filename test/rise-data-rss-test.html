@@ -53,6 +53,9 @@
         const invalidRssJson = {
           Error: "An error has occurred"
         };
+        const eConnResetJson = {
+          Error: "ECONNRESET"
+        };
         let sandbox = sinon.createSandbox();
         let element;
         let fetchMixin, cacheMixin, riseElement, loggerMixin;
@@ -340,6 +343,38 @@
             });
           });
 
+          test("should handle an error from a feed provider", done => {
+            sandbox.stub(cacheMixin, "getCache").rejects();
+            window.fetch.resolves(new Response(JSON.stringify(eConnResetJson)));
+
+            element.feedurl = sampleFeedUrl;
+
+            setTimeout(() => {
+              assert.isTrue(window.fetch.called);
+              assert.equal(window.fetch.args[0][0], sampleServerUrl + sampleFeedUrl);
+
+              setTimeout(() => {
+                assert.isTrue(riseElement._setUptimeError.calledWith(false));
+
+                // Should log the received data
+                assert.equal(element.log.getCall(1).args[1], "data received");
+                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                // Should log the warning data
+                assert.equal(element.log.getCall(2).args[0], "warning");
+                assert.equal(element.log.getCall(2).args[1], "feed provider error");
+                assert.deepEqual(element.log.getCall(2).args[2], {
+                  feed: "https://www.feedforall.com/sample.xml",
+                  error: eConnResetJson.Error
+                });
+                // Should send a feed-provider-error event
+                assert.equal(element._sendEvent.getCall(0).args[0], "feed-provider-error");
+                assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: eConnResetJson.Error });
+
+                done();
+              }, 20);
+            });
+          });
+
           test("should handle failure to connect to feed-parser", done => {
             let errorMessage = "Failed to connect to feed-parser";
 
@@ -392,6 +427,19 @@
                 done();
               }, 20);
             });
+          });
+        });
+
+        suite("_isFeedProviderError", () => {
+          test("should return true if it is a feed provider error", () => {
+            assert.isTrue(element._isFeedProviderError("ETIMEDOUT"));
+            assert.isTrue(element._isFeedProviderError("ECONNRESET"));
+            assert.isTrue(element._isFeedProviderError("Parse Error"));
+          });
+
+          test("should return false if it is not a feed provider error", () => {
+            assert.isFalse(element._isFeedProviderError("Invalid url"));
+            assert.isFalse(element._isFeedProviderError());
           });
         });
       });

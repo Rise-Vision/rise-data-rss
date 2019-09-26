@@ -128,6 +128,15 @@
         document.querySelector('#rssErrors').innerHTML = JSON.stringify(error);
       });
 
+      riseDataRSS01.addEventListener("feed-provider-error", error => {
+        console.log("There were problems with the feed provider", error);
+
+        document.querySelector('#rssErrors').style.display = "block";
+        document.querySelector('#rssFeed').style.display = "none";
+
+        document.querySelector('#rssErrors').innerHTML = JSON.stringify(error);
+      });
+
       riseDataRSS01.addEventListener("request-error", error => {
         console.log("Failed to connect to feed-parser", error);
 
