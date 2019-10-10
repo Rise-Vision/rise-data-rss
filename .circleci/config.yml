@@ -31,6 +31,7 @@ jobs:
       - checkout
       - restore_cache:
           key: node-cache-{{ checksum "package.json" }}
+      - run: sudo npm install -g wct-istanbul
       - run: npm test
 
   build:
