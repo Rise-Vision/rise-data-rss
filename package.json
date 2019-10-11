@@ -6,8 +6,7 @@
     "prebuild": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh prod rise-data-rss",
     "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-data-rss",
     "pretest": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh test rise-data-rss",
-    "test": "eslint . && polymer test",
-    "testci": "eslint . && polymer test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test": "eslint . && polymer test"
   },
   "repository": {
     "type": "git",
