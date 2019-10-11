@@ -5,6 +5,15 @@
   "plugins": {
     "local": {
       "browsers": ["chrome"]
+    },
+    "istanbul": {
+      "reporters": ["text", "text-summary", "lcov"],
+      "include": [
+        "**/src/**/*.js"
+      ],
+      "exclude": [
+        "**/test/**"
+      ]
     }
   }
 }
