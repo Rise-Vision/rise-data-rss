@@ -108,6 +108,12 @@ Execute the following command in Terminal to run tests:
 npm run test
 ```
 
+In case `polymer-cli` was installed globally, the `wct-istanbul` package will also need to be installed globally:
+
+```
+npm install -g wct-istanbul
+```
+
 #### Local Server
 Run the following command in Terminal: `polymer serve`.
 
