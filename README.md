@@ -1,4 +1,4 @@
-# Rise Data Rss [![CircleCI](https://circleci.com/gh/Rise-Vision/rise-data-rss/tree/master.svg?style=svg)](https://circleci.com/gh/Rise-Vision/rise-data-rss/tree/master)
+# Rise Data Rss [![CircleCI](https://circleci.com/gh/Rise-Vision/rise-data-rss/tree/master.svg?style=svg)](https://circleci.com/gh/Rise-Vision/rise-data-rss/tree/master) [![Coverage Status](https://coveralls.io/repos/github/Rise-Vision/rise-data-rss/badge.svg?branch=master)](https://coveralls.io/github/Rise-Vision/rise-data-rss?branch=master)
 
 ## Introduction
 
