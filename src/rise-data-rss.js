@@ -149,9 +149,13 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       if (!this._isFeedProviderError(error)) {
         this.log( "error", "data error", { feed: this.feedurl, error });
         this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
+
+        this._notifyBugsnag(error, "data error");
       } else {
         this.log( "warning", "feed provider error", { feed: this.feedurl, error });
         this._sendRssEvent(RiseDataRss.EVENT_FEED_PROVIDER_ERROR, { error });
+
+        this._notifyBugsnag(error, "feed provider error");
       }
     }
   }
@@ -165,6 +169,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
     if (!(err && err.isOffline)) {
       this._sendRssEvent(RiseDataRss.EVENT_REQUEST_ERROR, { error });
+
+      this._notifyBugsnag(err, "general error");
     }
   }
 
@@ -182,6 +188,10 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
       break;
     default:
     }
+  }
+
+  _notifyBugsnag(error, context) {
+    window.bugsnagClient && window.bugsnagClient.notify(error, { context });
   }
 }
 
