@@ -45,20 +45,8 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
   }
 
   // Event name constants
-  static get EVENT_DATA_UPDATE() {
-    return "data-update";
-  }
-
-  static get EVENT_DATA_ERROR() {
-    return "data-error";
-  }
-
   static get EVENT_FEED_PROVIDER_ERROR() {
     return "feed-provider-error";
-  }
-
-  static get EVENT_REQUEST_ERROR() {
-    return "request-error";
   }
 
   constructor() {
@@ -82,7 +70,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
     super.initCache({
       name: this.tagName.toLowerCase(),
       expiry: -1
-    });    
+    });
   }
 
   _handleStart() {
