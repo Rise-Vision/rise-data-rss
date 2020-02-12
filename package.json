@@ -3,6 +3,7 @@
   "version": "1.0.11",
   "description": "Rise Data Rss",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "prebuild": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh prod rise-data-rss",
     "build": "polymer build && ./node_modules/rise-common-component/scripts/extract-source.sh rise-data-rss",
     "pretest": "eslint . && ./node_modules/rise-common-component/scripts/create_config.sh test rise-data-rss",
@@ -41,5 +42,8 @@
     "sinon": "^7.3.2",
     "wct-istanbul": "^0.14.3",
     "wct-mocha": "^1.0.0"
+  },
+  "resolutions": {
+    "braces": "^2.3.1"
   }
 }
