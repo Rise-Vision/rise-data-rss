@@ -38,6 +38,7 @@
         suite("title", () => {
           test("should return the correct title", () => {
             assert.equal(formatter.formatFeed({}).title, null);
+            assert.equal(formatter.formatFeed(nullSample).title, null);
             assert.equal(formatter.formatFeed(nprSample).title, "In Book, Former Defense Chief Mattis Sideswipes President Trump's Leadership Skills");
             assert.equal(formatter.formatFeed(wiredSample).title, "Fitbit Premium, Versa 2, Aria Air: Pricing, Specs, Details");
             assert.equal(formatter.formatFeed(espnSample).title, "Kobe: 'Nothin but love' for Shaq after drama");
@@ -49,6 +50,7 @@
         suite("description", () => {
           test("should return the correct description", () => {
             assert.equal(formatter.formatFeed({}).description, null);
+            assert.equal(formatter.formatFeed(nullSample).description, null);
             assert.equal(formatter.formatFeed(nprSample).description, "In the general's upcoming leadership book,<em> Call Sign Chaos,</em> the Obama administration catches the most flak. Mattis barely mentions President Trump but implies criticism of the sitting president.");
             assert.equal(formatter.formatFeed(wiredSample).description, "The company’s new offerings include two fitness-tracking products, a subscription service for personalized health advice, and lots and lots of partnerships.");
             assert.equal(formatter.formatFeed(espnSample).description, "<p>Kobe Bryant and Shaquille O'Neal</p>, who won three titles together with the Lakers, were trending after a quote from Bryant on July 29 surfaced, saying he could have had \"12 rings\" if O'Neal spent more time in the gym.");
@@ -60,6 +62,7 @@
         suite("link", () => {
           test("should return the correct link", () => {
             assert.equal(formatter.formatFeed({}).link, null);
+            assert.equal(formatter.formatFeed(nullSample).link, null);
             assert.equal(formatter.formatFeed(nprSample).link, "https://www.npr.org/2019/08/28/755018189/in-book-former-defense-chief-mattis-side-swipes-president-trump-s-leadership-ski?utm_medium=RSS&utm_campaign=news");
             assert.equal(formatter.formatFeed(wiredSample).link, "https://www.wired.com/story/fitbit-versa-2-aria-air-smart-scale-fitbit-premium");
             assert.equal(formatter.formatFeed(espnSample).link, "http://www.espn.com/nba/story/_/id/27485035/kobe-nothin-love-shaq-drama");
@@ -71,6 +74,7 @@
         suite("imageUrl", () => {
           test("should return the correct imageUrl", () => {
             assert.equal(formatter.formatFeed({}).imageUrl, null);
+            assert.equal(formatter.formatFeed(nullSample).imageUrl, null);
             assert.equal(formatter.formatFeed(nprSample).imageUrl, "https://media.npr.org/assets/img/2019/08/28/gettyimages-1074493698_wide-d77a974046aaf94c8bd37c8083750e56ee67606a.jpg?s=600");
             assert.equal(formatter.formatFeed(wiredSample).imageUrl, "https://media.wired.com/photos/5d65a6d443e62000086148e5/master/pass/Gear-Fitbit_Versa_2-Lead.jpg");
             assert.equal(formatter.formatFeed(espnSample).imageUrl, "https://a.espncdn.com/photo/2016/1101/r147434_600x400_3-2.jpg");
@@ -82,6 +86,7 @@
         suite("author", () => {
           test("should return the correct author", () => {
             assert.equal(formatter.formatFeed({}).author, null);
+            assert.equal(formatter.formatFeed(nullSample).author, null);
             assert.equal(formatter.formatFeed(nprSample).author, "David Welna");
             assert.equal(formatter.formatFeed(wiredSample).author, "Adrienne So");
             assert.equal(formatter.formatFeed(espnSample).author, null);
@@ -93,6 +98,7 @@
         suite("pubDate", () => {
           test("should return the correct pubDate", () => {
             assert.equal(formatter.formatFeed({}).pubDate, null);
+            assert.equal(formatter.formatFeed(nullSample).pubDate, null);
             assert.equal(formatter.formatFeed(nprSample).pubDate, "2019-08-28T17:52:00.000Z");
             assert.equal(formatter.formatFeed(wiredSample).pubDate, "2019-08-28T13:00:00.000Z");
             assert.equal(formatter.formatFeed(espnSample).pubDate, "2019-08-28T19:27:14.000Z");
@@ -177,6 +183,19 @@
             assert.deepEqual(formatter._removeEmptyElements(htmlWithoutImages, ["a", "p"]), "<p>This is text</p>");
           });
         });
+
+        suite("_cleanString", () => {
+          test("should return null if the string === 'null'", () => {
+            assert.isNull(formatter._cleanString("null"));
+            assert.isNull(formatter._cleanString("  null  "));
+            assert.isNull(formatter._cleanString("  NULL  "));
+          });
+
+          test("should return the original string if string !== 'null'", () => {
+            assert.equal(formatter._cleanString("test"), "test");
+            assert.equal(formatter._cleanString("  test  "), "  test  ");
+          });
+        });
       });
 
       let nprSample = {
@@ -253,6 +272,18 @@
             "height": "1800"
           }
         }
+      };
+
+      let nullSample = {
+        "title": "null",
+        "description": "null",
+        "link": "null",
+        "rss:image": {
+          "@": {},
+          "#": "null"
+        },
+        "author": "null",
+        "pubDate": "null"
       };
 
       let espnSample = {
