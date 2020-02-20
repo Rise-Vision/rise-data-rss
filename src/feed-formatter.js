@@ -16,7 +16,7 @@ export default class FeedFormatter {
   }
 
   _getTitle (feed) {
-    return feed.title;
+    return this._cleanString(feed.title);
   }
 
   _getDescription (feed) {
@@ -36,11 +36,11 @@ export default class FeedFormatter {
       description = this._removeAttributes(description, ["style"]);
     }
 
-    return description;
+    return this._cleanString(description);
   }
 
   _getLink (feed) {
-    return feed.link || feed.permalink;
+    return this._cleanString(feed.link || feed.permalink);
   }
 
   _getImageUrl (feed) {
@@ -75,15 +75,15 @@ export default class FeedFormatter {
       foundImages.push(feed.image.url);
     }
 
-    return this._getBestImage(foundImages);
+    return this._cleanString(this._getBestImage(foundImages));
   }
 
   _getAuthor (feed) {
-    return feed.author;
+    return this._cleanString(feed.author);
   }
 
   _getPubDate (feed) {
-    return feed.pubdate || feed.pubDate;
+    return this._cleanString(feed.pubdate || feed.pubDate);
   }
 
   _isValidImage (imageUrl, validFormats) {
@@ -190,5 +190,13 @@ export default class FeedFormatter {
     div.innerHTML = html;
 
     return div;
+  }
+
+  _cleanString (value) {
+    if (typeof value === "string" && value.trim().toLowerCase() === "null") {
+      return null;
+    } else {
+      return value;
+    }
   }
 }
