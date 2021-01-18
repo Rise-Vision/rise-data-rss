@@ -395,7 +395,8 @@
 
                 // Should log the request error data
                 assert.equal(element.log.getCall(1).args[1], "request error");
-                assert.deepEqual(element.log.getCall(1).args[2], { error: errorMessage });
+                assert.deepEqual(element.log.getCall(1).args[2], { errorCode: "E000000037" });
+                assert.deepEqual(element.log.getCall(1).args[3], { error: errorMessage });
                 // Should send a request-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
