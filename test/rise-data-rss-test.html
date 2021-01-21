@@ -330,7 +330,8 @@
                 assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
                 // Should log the error data
                 assert.equal(element.log.getCall(2).args[1], "data error");
-                assert.deepEqual(element.log.getCall(2).args[2], {
+                assert.deepEqual(element.log.getCall(2).args[2], { errorCode: 'E000000036' });
+                assert.deepEqual(element.log.getCall(2).args[3], {
                   feed: "https://www.feedforall.com/sample.xml",
                   error: invalidRssJson.Error
                 });
@@ -380,7 +381,7 @@
 
             sandbox.stub(cacheMixin, "getCache").rejects();
             sandbox.stub(riseElement, "isOffline").resolves(false);
-            sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
+            sandbox.stub(fetchMixin, "_shouldRetryFor").returns(false);
 
             window.fetch.rejects({ message: errorMessage });
 
@@ -394,7 +395,8 @@
 
                 // Should log the request error data
                 assert.equal(element.log.getCall(1).args[1], "request error");
-                assert.deepEqual(element.log.getCall(1).args[2], { error: errorMessage });
+                assert.deepEqual(element.log.getCall(1).args[2], { errorCode: "E000000037" });
+                assert.deepEqual(element.log.getCall(1).args[3], { error: errorMessage });
                 // Should send a request-error event
                 assert.equal(element._sendEvent.getCall(0).args[0], "request-error");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], { error: errorMessage });
@@ -410,7 +412,7 @@
             sandbox.stub(element, "_handleResponse");
             sandbox.stub(cacheMixin, "getCache").rejects();
             sandbox.stub(riseElement, "isOffline").resolves(true);
-            sandbox.stub(fetchMixin, "_isMaxRetryAttempt").returns(true);
+            sandbox.stub(fetchMixin, "_shouldRetryFor").returns(false);
             window.fetch.rejects({ message: errorMessage });
 
             element.feedurl = sampleFeedUrl;
