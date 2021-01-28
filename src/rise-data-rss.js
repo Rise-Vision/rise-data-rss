@@ -138,7 +138,7 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
         this.log( RiseDataRss.LOG_TYPE_ERROR, "data error", {errorCode: "E000000036"}, { feed: this.feedurl, error });
         this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
       } else {
-        this.log( RiseDataRss.LOG_TYPE_WARNING, "feed provider error", { feed: this.feedurl, error });
+        this.log( RiseDataRss.LOG_TYPE_WARNING, "feed provider error", null, { feed: this.feedurl, error });
         this._sendRssEvent(RiseDataRss.EVENT_FEED_PROVIDER_ERROR, { error });
       }
     }

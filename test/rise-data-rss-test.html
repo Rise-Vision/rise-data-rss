@@ -240,7 +240,8 @@
 
               // Should log the received data
               assert.equal(element.log.getCall(1).args[1], "data received");
-              assert.deepEqual(element.log.getCall(1).args[2], { cached: true });
+              assert.deepEqual(element.log.getCall(1).args[2], null);
+              assert.deepEqual(element.log.getCall(1).args[3], { cached: true });
               // Should send a data-update event
               assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
               assert.equal(JSON.stringify(element._sendEvent.getCall(0).args[1]), JSON.stringify(formattedRssJson));
@@ -266,7 +267,8 @@
 
               // Should log the received data
               assert.equal(element.log.getCall(1).args[1], "data received");
-              assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+              assert.deepEqual(element.log.getCall(1).args[2], null);
+              assert.deepEqual(element.log.getCall(1).args[3], { cached: false });
               // Should log that it provided new data to the client
               assert.equal(element.log.getCall(2).args[1], "data provided");
               // Should send a data-update event
@@ -302,7 +304,8 @@
 
                 // Should log the received data
                 assert.equal(element.log.getCall(1).args[1], "data received");
-                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                assert.deepEqual(element.log.getCall(1).args[2], null);
+                assert.deepEqual(element.log.getCall(1).args[3], { cached: false });
                 // Should send a data-update event
                 assert.equal(element._sendEvent.getCall(0).args[0], "data-update");
                 assert.deepEqual(element._sendEvent.getCall(0).args[1], largeRssJson.slice(0, 15));
@@ -327,7 +330,8 @@
 
                 // Should log the received data
                 assert.equal(element.log.getCall(1).args[1], "data received");
-                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                assert.equal(element.log.getCall(1).args[2], null);
+                assert.deepEqual(element.log.getCall(1).args[3], { cached: false });
                 // Should log the error data
                 assert.equal(element.log.getCall(2).args[1], "data error");
                 assert.deepEqual(element.log.getCall(2).args[2], { errorCode: 'E000000036' });
@@ -359,11 +363,13 @@
 
                 // Should log the received data
                 assert.equal(element.log.getCall(1).args[1], "data received");
-                assert.deepEqual(element.log.getCall(1).args[2], { cached: false });
+                assert.equal(element.log.getCall(1).args[2], null);
+                assert.deepEqual(element.log.getCall(1).args[3], { cached: false });
                 // Should log the warning data
                 assert.equal(element.log.getCall(2).args[0], "warning");
                 assert.equal(element.log.getCall(2).args[1], "feed provider error");
-                assert.deepEqual(element.log.getCall(2).args[2], {
+                assert.equal(element.log.getCall(1).args[2], null);
+                assert.deepEqual(element.log.getCall(2).args[3], {
                   feed: "https://www.feedforall.com/sample.xml",
                   error: eConnResetJson.Error
                 });
