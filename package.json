@@ -1,6 +1,6 @@
 {
   "name": "rise-data-rss",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Rise Data Rss",
   "scripts": {
     "preinstall": "npx npm-force-resolutions || true",
