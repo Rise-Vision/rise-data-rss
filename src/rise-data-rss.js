@@ -134,12 +134,29 @@ export default class RiseDataRss extends FetchMixin(fetchBase) {
 
       this._latestFailed = true;
 
-      if (!this._isFeedProviderError(error)) {
-        this.log( RiseDataRss.LOG_TYPE_ERROR, "data error", {errorCode: "E000000036"}, { feed: this.feedurl, error });
-        this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
-      } else {
+      if (this._isFeedProviderError(error)) {
         this.log( RiseDataRss.LOG_TYPE_WARNING, "feed provider error", null, { feed: this.feedurl, error });
         this._sendRssEvent(RiseDataRss.EVENT_FEED_PROVIDER_ERROR, { error });
+      } else {
+
+        let errorCode = "E000000061";
+
+        if ( error.toLowerCase() === "401 unauthorized" ) {
+          //feed authentication error
+          errorCode = "E000000057";
+        } else if ( error.toLowerCase() === "404 not found" ) {
+          //feed not found
+          errorCode = "E000000058";
+        } else if ( error.toLowerCase() === "not a feed" ) {
+          //not a feed
+          errorCode = "E000000059";
+        } else if ( error.indexOf( "403" ) > 0 && error.toLowerCase().indexOf( "forbidden" ) > 0 ) {
+          //feed request error
+          errorCode = "E000000060";
+        }
+
+        this.log( RiseDataRss.LOG_TYPE_ERROR, "data error", {errorCode}, { feed: this.feedurl, error });
+        this._sendRssEvent(RiseDataRss.EVENT_DATA_ERROR, { error });
       }
     }
   }
